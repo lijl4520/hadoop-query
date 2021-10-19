@@ -2,7 +2,7 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.querys.domain.rest;
+package com.huawei.xdrs.domain.rest;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.huawei.commons.domain.rest.BaseEntity;
@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 
 /**
  * @Author Lijl
- * @ClassName RequestBody
- * @Description 请求参数实体
- * @Date 2021/9/7 17:31
+ * @ClassName RequestBodyEntity
+ * @Description TODO
+ * @Date 2021/10/18 15:33
  * @Version 1.0
  */
 @Data
-public class RestBodyEntity implements BaseEntity {
+public class RequestBodyEntity implements BaseEntity {
     private String msisdn;
     private String imsi;
     private String imei;
@@ -32,4 +32,6 @@ public class RestBodyEntity implements BaseEntity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyyMMddHHmmss")
     @DateTimeFormat(pattern = "yyyyMMddHHmmss")
     private LocalDateTime endTime;
+    private String province;
+    private String city;
 }

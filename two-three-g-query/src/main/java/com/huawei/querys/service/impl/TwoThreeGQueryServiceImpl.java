@@ -4,6 +4,8 @@
 
 package com.huawei.querys.service.impl;
 
+import com.huawei.commons.domain.annotation.ActionService;
+import com.huawei.commons.service.BaseService;
 import com.huawei.commons.service.Hbase;
 import com.huawei.commons.service.HbaseManager;
 import com.huawei.commons.service.QueryTaskManager;
@@ -14,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * @Author Lijl
@@ -23,8 +25,8 @@ import java.util.Map;
  * @Date 2021/10/14 16:52
  * @Version 1.0
  */
-@Service
-public class TwoThreeGQueryServiceImpl extends AbstractService implements TwoThreeGQueryService {
+@ActionService(value = "queryTwoThreeG")
+public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseService<RestBodyEntity> {
 
     private HbaseManager hbaseManager;
 
@@ -40,11 +42,12 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements TwoThr
         this.queryTaskManager = queryTaskManager;
     }
 
+
     @Override
-    public List<Map<String, Object>> queryTwoThreeGData(RestBodyEntity restBodyEntity) {
-        Hbase hbase = this.hbaseManager.getHbaseInstance();
+    public Object actionMethod(RestBodyEntity restBodyEntity) {
         List<String> tableNameList = super.getTableNameList(restBodyEntity,"GN");
         List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(restBodyEntity);
+        Hbase hbase = this.hbaseManager.getHbaseInstance();
         List<Result> resultList = this.queryTaskManager.query(hbase, tableNameList, startAndEndRowKeys);
         return super.toMapList(resultList);
     }

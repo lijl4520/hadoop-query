@@ -81,7 +81,9 @@ public class QueryTaskManager {
             if (query.size()>10000){
                 Asserts.fail(ResultCode.DATA_EXCESS);
             }
+        }else{
+            Asserts.fail(ResultCode.FAILED);
         }
-        return null;
+        return query;
     }
 }

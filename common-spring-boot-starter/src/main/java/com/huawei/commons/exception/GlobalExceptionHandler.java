@@ -5,6 +5,7 @@
 package com.huawei.commons.exception;
 
 import com.huawei.commons.domain.resp.CommonResult;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -44,6 +45,13 @@ public class GlobalExceptionHandler {
             }
         }
         return CommonResult.validateFailed(message);
+    }
+
+
+    @ResponseBody
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public CommonResult handleMessageNotReadableException(HttpMessageNotReadableException e){
+        return CommonResult.validateFailed("时间区间必填");
     }
 
     @ResponseBody

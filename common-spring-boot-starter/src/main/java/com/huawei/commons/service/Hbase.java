@@ -10,6 +10,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
@@ -95,9 +96,8 @@ public class Hbase {
             }
             log.info("***************  query table {} end *************** ThreadName:{} *******", tableNameStr,threadName);
             long endTime = System.currentTimeMillis();
-            log.warn("*************** query table {} time consuming {} ms ***** ThreadName:{} ******",endTime-strtTime,threadName);
+            log.warn("*************** query table {} time consuming {} ms ***** ThreadName:{} ******",tableNameStr,endTime-strtTime,threadName);
         }
         return resultList;
     }
-
 }

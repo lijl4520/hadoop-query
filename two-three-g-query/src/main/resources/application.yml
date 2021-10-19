@@ -2,23 +2,23 @@ hadoop:
   commons:
     zookeeper:
       config:
-        zookeeper_quorum: hebsjzx-schbase-master-47-158,hebsjzx-schbase-master-47-75,hebsjzx-schbase-master-47-96 #zk¼¯ÈºµØÖ·
+        zookeeper_quorum: hebsjzx-schbase-master-47-158,hebsjzx-schbase-master-47-75,hebsjzx-schbase-master-47-96 #zkï¿½ï¿½Èºï¿½ï¿½Ö·
     kerberos:
       config:
-        keytab-path: /home/bdi/api/cmit_wzzjc_wzjd.keytab #ÃÜÔ¿ÅäÖÃ
+        keytab-path: /home/bdi/api/cmit_wzzjc_wzjd.keytab #keytabæ–‡ä»¶è·¯å¾„
         kerberos-conf-path: /home/bdi/api/krb5.conf #krb5
-        kerberos-user: cmit_wzzjc_wzjd #zkÓÃ»§
-        zookeeper-default-server-principal: cmit_wzzjc_wzjd@SCKDC #zkÓÃ»§Ö÷Ìå
-        principal: hbase/_HOST@SCKDC #hbase Ö÷Ìå
+        kerberos-user: cmit_wzzjc_wzjd #zkç”¨æˆ·
+        zookeeper-default-server-principal: cmit_wzzjc_wzjd@SCKDC #zkä¸»ä½“
+        principal: hbase/_HOST@SCKDC #hbaseä¸»ä½“
         znode-parent: /hbase-secure
 thread-pool:
-  core_pool_size: 3 #³õÊ¼Ïß³ÌÊı
-  max_pool_size: 10 #×î´óÏß³ÌÊı
-  queue_capacity: 512 #¶ÓÁĞÊı
-  keep_alive_seconds: 10 #µÈ´ıÊ±¼ä
-  hread_name_prefix: query-hbase-thread-pool-%d #Ïß³ÌÃû³Æ
+  core_pool_size: 3 #åˆå§‹çº¿ç¨‹æ•°
+  max_pool_size: 10 #æœ€å¤§çº¿ç¨‹æ•°
+  queue_capacity: 512 #é˜Ÿåˆ—æ•°
+  keep_alive_seconds: 10 #ç­‰å¾…æ—¶é—´
+  hread_name_prefix: query-hbase-thread-pool-%d #çº¿ç¨‹åç§°
 encryp-decryp:
-   url: http://10.252.15.211:9010/Adapter/getKey.do #sm4·şÎñµØÖ·
+   url: http://10.252.15.211:9010/Adapter/getKey.do #sm4 åŠ å¯†æœåŠ¡åœ°å€
 server:
   servlet:
     context-path: /hbase-query
