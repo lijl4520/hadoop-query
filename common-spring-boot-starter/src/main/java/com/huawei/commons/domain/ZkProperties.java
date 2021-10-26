@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @Author Lijl
  * @ClassName ZkProperties
- * @Description zk集群配置
+ * @Description zk集群参数
  * @Date 2021/10/14 16:02
  * @Version 1.0
  */

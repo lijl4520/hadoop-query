@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -43,7 +44,7 @@ public class QueryTaskManager {
      * @param endRowKey     endRowKey
      * @return 多张表合并结果集
      */
-    private List<Result> query(Hbase hbase, List<String> tableNameList, String startRowKey, String endRowKey) {
+    /*private List<Result> query(Hbase hbase, List<String> tableNameList, String startRowKey, String endRowKey) {
         log.info("=========>StartRowKey:{}/EndRowKey:{}",startRowKey,endRowKey);
         List<Result> resultList = new ArrayList<>();
         for (String tableName : tableNameList) {
@@ -59,7 +60,7 @@ public class QueryTaskManager {
             }
         }
         return resultList;
-    }
+    }*/
 
     /**
      * @Author lijiale
@@ -72,7 +73,7 @@ public class QueryTaskManager {
      * @param startAndEndRowKeyList
      * @return: java.util.List<org.apache.hadoop.hbase.client.Result>
     **/
-    public List<Result> query(Hbase hbase, List<String> tableNameList,List<String> startAndEndRowKeyList){
+    /*public List<Result> query(Hbase hbase, List<String> tableNameList,List<String> startAndEndRowKeyList){
         long startTime = System.currentTimeMillis();
         List<Result> query = query(hbase, tableNameList, startAndEndRowKeyList.get(0), startAndEndRowKeyList.get(1));
         long endTime = System.currentTimeMillis();
@@ -85,5 +86,38 @@ public class QueryTaskManager {
             Asserts.fail(ResultCode.FAILED);
         }
         return query;
+    }*/
+
+    public <T> List<T> query(HbaseOperations hbase, List<String> tableNameList,List<String> startAndEndRowKeyList){
+        long startTime = System.currentTimeMillis();
+        List query = query(hbase, tableNameList, startAndEndRowKeyList.get(0), startAndEndRowKeyList.get(1));
+        long endTime = System.currentTimeMillis();
+        log.info("线程->{},查询耗时:{}秒",Thread.currentThread().getName(),(endTime-startTime)/1000);
+        if (query!=null){
+            if (query.size()>10000){
+                Asserts.fail(ResultCode.DATA_EXCESS);
+            }
+        }else{
+            Asserts.fail(ResultCode.FAILED);
+        }
+        return query;
+    }
+
+    private <T> List<T> query(HbaseOperations hbase, List<String> tableNameList, String startRowKey, String endRowKey) {
+        log.info("=========>StartRowKey:{}/EndRowKey:{}",startRowKey,endRowKey);
+        List resultList = new ArrayList<>();
+        for (String tableName : tableNameList) {
+            QueryTask queryTask = new QueryTask(hbase, HBASE_USER_NAME+tableName, startRowKey, endRowKey,new MapRowMapper());
+            try {
+                Future future = executorService.submit(queryTask);
+                List list = (List) future.get();
+                resultList.addAll(list);
+            } catch (InterruptedException e) {
+                Asserts.fail(ResultCode.FAILED);
+            } catch (ExecutionException e) {
+                Asserts.fail(ResultCode.FAILED);
+            }
+        }
+        return resultList;
     }
 }

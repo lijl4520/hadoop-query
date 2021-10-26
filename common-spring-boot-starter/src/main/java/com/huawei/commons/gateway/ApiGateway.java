@@ -30,15 +30,14 @@ public class ApiGateway {
      * @Date 17:28 2021/10/19
      * @Version 1.0
      * @param version 服务版本号
-     * @param action 挨批服务名
+     * @param action API服务名
      * @param jsonObject 接口参数
      * @return: com.huawei.commons.domain.resp.CommonResult
     **/
     @LoadPointcut
     @PostMapping(value = "/{action}")
-    @ResponseBody
     public CommonResult unifiedInlet(@PathVariable String version,@PathVariable String action, @RequestBody JSONObject jsonObject){
-        log.info("========> method {} requestBody:{}",action,jsonObject.toString());
+        log.info("========> server {} method {} requestBody:{}",version,action,jsonObject.toString());
         return CommonResult.success(new BaseServiceManager
                 .Builder().
                 action(action).

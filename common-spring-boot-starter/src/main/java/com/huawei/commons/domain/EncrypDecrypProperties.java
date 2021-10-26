@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @Author Lijl
  * @ClassName EncrypDecrypProperties
- * @Description 加解密rest地址配置
+ * @Description 加解密rest地址参数
  * @Date 2021/10/14 17:23
  * @Version 1.0
  */

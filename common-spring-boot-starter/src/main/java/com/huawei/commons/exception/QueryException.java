@@ -9,8 +9,8 @@ import com.huawei.commons.domain.code.IErrorCode;
 
 /**
  * @Author Lijl
- * @ClassName XdrException
- * @Description 自定义API异常
+ * @ClassName QueryException
+ * @Description 自定义异常
  * @Date 2021/9/13 10:42
  * @Version 1.0
  */

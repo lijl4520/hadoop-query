@@ -4,6 +4,8 @@
 
 package com.huawei.commons.domain;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 /**
  * @Author Lijl
  * @ClassName HadoopProperties
@@ -11,9 +13,6 @@ package com.huawei.commons.domain;
  * @Date 2021/10/14 11:22
  * @Version 1.0
  */
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 @ConfigurationProperties(prefix = "hadoop.commons.kerberos.config")
 public class KerberosProperties {
 

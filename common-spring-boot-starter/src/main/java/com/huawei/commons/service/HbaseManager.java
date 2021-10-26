@@ -44,9 +44,9 @@ public class HbaseManager {
      * @param
      * @return: com.huawei.querys.service.Hbase
     **/
-    public Hbase getHbaseInstance(){
+    public HbaseOperations getHbaseInstance(){
         kerberos.login();
-        Hbase hbase = new Hbase(zkProperties);
+        HbaseOperations hbase = new Hbase(zkProperties);
         return hbase;
     }
 }

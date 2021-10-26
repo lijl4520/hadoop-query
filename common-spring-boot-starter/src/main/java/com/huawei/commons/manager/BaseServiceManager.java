@@ -7,6 +7,7 @@ package com.huawei.commons.manager;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.commons.domain.annotation.ActionService;
 import com.huawei.commons.domain.code.ResultCode;
+import com.huawei.commons.domain.rest.BaseEntity;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.service.BaseService;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -46,7 +47,6 @@ public class BaseServiceManager{
         private JSONObject json;
 
         public Builder(){
-
         }
 
         public Builder action(String action){
