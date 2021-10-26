@@ -5,10 +5,7 @@
 package com.huawei.querys.service.impl;
 
 import com.huawei.commons.domain.annotation.ActionService;
-import com.huawei.commons.service.BaseService;
-import com.huawei.commons.service.Hbase;
-import com.huawei.commons.service.HbaseManager;
-import com.huawei.commons.service.QueryTaskManager;
+import com.huawei.commons.service.*;
 import com.huawei.querys.domain.rest.RestBodyEntity;
 import com.huawei.querys.service.*;
 import org.apache.hadoop.hbase.client.Result;
@@ -47,8 +44,8 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
     public Object actionMethod(RestBodyEntity restBodyEntity) {
         List<String> tableNameList = super.getTableNameList(restBodyEntity,"GN");
         List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(restBodyEntity);
-        Hbase hbase = this.hbaseManager.getHbaseInstance();
-        List<Result> resultList = this.queryTaskManager.query(hbase, tableNameList, startAndEndRowKeys);
-        return super.toMapList(resultList);
+        HbaseOperations hbase = this.hbaseManager.getHbaseInstance();
+        List resultList = this.queryTaskManager.query(hbase, tableNameList, startAndEndRowKeys);
+        return resultList;
     }
 }

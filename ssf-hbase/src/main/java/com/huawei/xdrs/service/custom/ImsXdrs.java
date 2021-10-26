@@ -8,7 +8,6 @@ import com.huawei.commons.domain.annotation.ActionService;
 import com.huawei.commons.service.BaseService;
 import com.huawei.xdrs.domain.rest.RequestBodyEntity;
 import com.huawei.xdrs.service.Xdrs;
-import org.springframework.stereotype.Component;
 
 /**
  * ImsXdrs

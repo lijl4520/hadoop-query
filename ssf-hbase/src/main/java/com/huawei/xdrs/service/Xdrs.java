@@ -99,23 +99,23 @@ public abstract class Xdrs {
                 .append(requestBody.getStartTime()
                         .atZone(ZoneId.of("Asia/Shanghai"))
                         .toInstant()
-                        .toEpochMilli())
-                .append("_");
+                        .toEpochMilli());
         endRowKeySb.append(cipherText).append("_")
                 .append(requestBody.getEndTime()
                         .atZone(ZoneId.of("Asia/Shanghai"))
                         .toInstant()
-                        .toEpochMilli())
-                .append("_");
+                        .toEpochMilli());
         String province = requestBody.getProvince();
         if (province!=null&&!"".equals(province)){
-            startRowKeySb.append(province).append("_");
-            endRowKeySb.append(province).append("_");
+            startRowKeySb.append("_")
+                    .append(province);
+            endRowKeySb.append("_")
+                    .append(province);
         }
         String city = requestBody.getCity();
         if (city!=null&&!"".equals(city)){
-            startRowKeySb.append(city);
-            endRowKeySb.append(city);
+            startRowKeySb.append("_").append(city);
+            endRowKeySb.append("_").append(city);
         }
         rowKeyList.add(startRowKeySb.toString());
         rowKeyList.add(endRowKeySb.toString());

@@ -16,13 +16,13 @@ thread-pool:
   max_pool_size: 10 #最大线程数
   queue_capacity: 512 #队列数
   keep_alive_seconds: 10 #等待时间
-  hread_name_prefix: query-hbase-thread-pool-%d #线程名称
+  thread_name_prefix: query-hbase-thread-pool-%d #线程名称
 encryp-decryp:
-  url: http://10.252.15.211:9010/Adapter/getKey.do #sm4 加密服务地址
+  url: http://10.252.15.211:9010/Adapter/getKey.do #sm4 加解密服务地址
 xdr:
   router-config:
-    effective-time: 20210909
-    old-time-interval:
+    effective-time: 20210909 #建表规则生效时间
+    old-time-interval: #旧规则-生效时间之前的规则
       - start-date: 00
         end-date: 08
       - start-date: 08
@@ -31,7 +31,7 @@ xdr:
         end-date: 18
       - start-date: 18
         end-date: 24
-    newer-time-interval:
+    newer-time-interval: #新规则-生效时间之后的规则
       - start-date: 00
         end-date: 10
       - start-date: 10

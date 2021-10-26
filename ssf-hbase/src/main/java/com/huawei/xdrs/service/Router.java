@@ -12,6 +12,7 @@ import com.huawei.xdrs.domain.rest.RequestBodyEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -67,15 +68,76 @@ public class Router {
         LocalDateTime stDate = requestBodyEntity.getStartTime();
         LocalDateTime edDate = requestBodyEntity.getEndTime();
         LocalDateTime ettDate = LocalDateTime.parse(effectiveTime + "000000", dtf);
-        if (stDate.isAfter(ettDate)){
+        if (stDate.isAfter(ettDate) || stDate.isEqual(ettDate)){
             getTableNames(stDate,edDate,newerTimeInterval,tableNames);
-        }else if (edDate.isAfter(ettDate)){
+            careteExpandTable(tableNames,newerTimeInterval,false,null,null,null);
+        }else if (edDate.isAfter(ettDate) || edDate.isEqual(ettDate)){
             getTableNames(stDate,ettDate.minusMinutes(1),oldTimeInterval,tableNames);
             getTableNames(ettDate,edDate,newerTimeInterval,tableNames);
+            careteExpandTable(tableNames,newerTimeInterval,false,null,null,null);
         }else{
             getTableNames(stDate,edDate,oldTimeInterval,tableNames);
+            careteExpandTable(tableNames,oldTimeInterval,false,null,newerTimeInterval,effectiveTime);
         }
         return tableNames;
+    }
+
+    /**
+     * @Author lijiale
+     * @MethodName careteExpandTable
+     * @Description 生成拓展表名
+     * @Date 17:23 2021/10/21
+     * @Version 1.0
+     * @param tableNames
+     * @param timeInterval
+     * @param b
+     * @param fDate
+     * @param newTimeInterval
+     * @param effectiveTime
+     * @return: void
+    **/
+    private void careteExpandTable(List<String> tableNames, List<? extends BaseProperties> timeInterval,
+                                   boolean b,String fDate,List<? extends BaseProperties> newTimeInterval,
+                                   String effectiveTime) {
+        //判断是否已按规则生成了表
+        if (tableNames.size()>0){
+            String tableName = tableNames.get(tableNames.size()-1);
+            String[] timeArr = tableName.split("_");
+            //是否传入时间
+            if (fDate==null){
+                fDate = timeArr[1];
+            }
+            String hours = timeArr[2];
+            int hours1 = Integer.parseInt(hours.substring(0, 2));
+            int hours2 = Integer.parseInt(hours.substring(2, 4));
+            int size = timeInterval.size();
+            for (int i = 0; i < size; i++) {
+                BaseProperties baseProperties = timeInterval.get(i);
+                int startDate = baseProperties.getStartDate();
+                int endDate = baseProperties.getEndDate();
+                if (b){
+                    tableNames.add("_"+fDate+"_"
+                            +(startDate<=9?"0"+startDate:startDate)+(endDate<=9?"0" + endDate:endDate));
+                    break;
+                }
+                if (hours1==startDate && hours2==endDate){
+                    if ((i+1)==size){
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+                        LocalDate localDate = LocalDate.parse(fDate, dtf).plusDays(1);
+                        String newDate = dtf.format(localDate);
+                        if (effectiveTime!=null && effectiveTime.equals(newDate)){
+                            careteExpandTable(tableNames,newTimeInterval,
+                                    true,newDate,null,null);
+                        }else{
+                            careteExpandTable(tableNames,timeInterval,
+                                    true,newDate,null,null);
+                        }
+                        break;
+                    }
+                    b = true;
+                }
+            }
+        }
     }
 
     /**
