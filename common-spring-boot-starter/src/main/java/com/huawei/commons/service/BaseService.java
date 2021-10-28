@@ -4,8 +4,6 @@
 
 package com.huawei.commons.service;
 
-import com.huawei.commons.domain.rest.BaseEntity;
-
 /**
  * @Author Lijl
  * @InterfaceName BaseService
@@ -13,7 +11,7 @@ import com.huawei.commons.domain.rest.BaseEntity;
  * @Date 2021/10/19 14:45
  * @Version 1.0
  */
-public interface BaseService<T extends BaseEntity> {
+public interface BaseService<T,R> {
 
     /**
      * @Author lijiale
@@ -21,8 +19,8 @@ public interface BaseService<T extends BaseEntity> {
      * @Description 通用业务方法
      * @Date 15:16 2021/10/19
      * @Version 1.0
-     * @param t
+     * @param r
      * @return: java.lang.Object
     **/
-    Object actionMethod(T t);
+    T actionMethod(R r);
 }

@@ -8,12 +8,8 @@ import com.huawei.commons.domain.code.ResultCode;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.service.EncryAndDecryService;
 import com.huawei.querys.domain.rest.RestBodyEntity;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,9 +46,14 @@ public abstract class AbstractService {
      * @param prefix
      * @return: java.util.List<java.lang.String>
     **/
-    protected List<String> getTableNameList(RestBodyEntity restBodyEntity, String prefix){
+    protected List<String> getTableNameList(RestBodyEntity restBodyEntity, final String prefix){
         List<String> tableNames = router.getTableNames(restBodyEntity);
-        return tableNames.stream().map(suffix -> prefix+suffix).collect(Collectors.toList());
+        return tableNames.stream().map(suffix ->
+                new StringBuilder("DWA_HW:")
+                        .append(prefix)
+                        .append(suffix)
+                        .toString())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -84,50 +85,13 @@ public abstract class AbstractService {
         }
 
         List<String> rowKeyList = new LinkedList<String>();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
         startRowKeySb.append(cipherText).append("_")
-                .append(restBody.getStartTime()
-                        .atZone(ZoneId.of("Asia/Shanghai"))
-                        .toInstant()
-                        .toEpochMilli());
+                .append(dateTimeFormatter.format(restBody.getStartTime()));
         endRowKeySb.append(cipherText).append("_")
-                .append(restBody.getEndTime()
-                        .atZone(ZoneId.of("Asia/Shanghai"))
-                        .toInstant()
-                        .toEpochMilli());
+                .append(dateTimeFormatter.format(restBody.getEndTime()));
         rowKeyList.add(startRowKeySb.toString());
         rowKeyList.add(endRowKeySb.toString());
         return rowKeyList;
-    }
-
-
-    /**
-     * @Author lijiale
-     * @MethodName toMapList
-     * @Description 获取数据
-     * @Date 9:41 2021/10/15
-     * @Version 1.0
-     * @param resultList
-     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
-    **/
-    protected List<Map<String,Object>> toMapList(List<Result> resultList){
-        List<Map<String,Object>> dataList;
-        if (resultList!=null){
-            dataList = new ArrayList<>();
-            for (Result result : resultList) {
-                Map<String,Object> resultMap = new HashMap<String,Object>(16);
-                List<Cell> cells = result.listCells();
-                if (cells!=null && cells.size()>0){
-                    for (int i = 0; i < cells.size(); i++) {
-                        Cell cell = cells.get(i);
-                        resultMap.put(Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength()),
-                                Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength())
-                        );
-                    }
-                    dataList.add(resultMap);
-                }
-            }
-            return dataList;
-        }
-        return null;
     }
 }

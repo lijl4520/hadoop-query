@@ -16,7 +16,7 @@ import com.huawei.xdrs.service.Xdrs;
  * @since 2021/9/2
  */
 @ActionService(value = "dpi")
-public class DpiXdrs extends Xdrs implements BaseService<RequestBodyEntity> {
+public class DpiXdrs extends Xdrs implements BaseService<Object,RequestBodyEntity> {
 
     @Override
     public Object actionMethod(RequestBodyEntity requestBodyEntity) {

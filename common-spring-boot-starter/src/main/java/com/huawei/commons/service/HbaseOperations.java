@@ -29,6 +29,10 @@ public interface HbaseOperations {
     **/
     <T> T execute(String tableName,TableCallback<T> action);
 
+
+    <T> List<T> find(String tableName,String startRowKey,
+               String endRowKey,String filterVal,final RowMapper<T> mapper);
+
     /**
      * @Author lijiale
      * @MethodName find
@@ -38,7 +42,7 @@ public interface HbaseOperations {
      * @param tableName
      * @param startRowKey
      * @param endRowKey
-     * @param action
+     * @param mapper
      * @return: java.util.List<T>
     **/
     <T> List<T> find(String tableName,String startRowKey,

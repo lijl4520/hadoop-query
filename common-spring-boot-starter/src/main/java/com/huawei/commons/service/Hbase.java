@@ -9,9 +9,14 @@ import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.exception.QueryException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.CompareOperator;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
+import org.apache.hadoop.hbase.filter.RowFilter;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.util.Assert;
 
@@ -76,6 +81,18 @@ public class Hbase implements HbaseOperations{
         }
     }
 
+    @Override
+    public <T> List<T> find(String tableName, String startRowKey, String endRowKey, String filterVal, RowMapper<T> mapper) {
+        FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        RowFilter rf = new RowFilter(CompareOperator.EQUAL,new SubstringComparator(filterVal));
+        fl.addFilter(rf);
+        Scan scan = new Scan();
+        scan.withStartRow(Bytes.toBytes(startRowKey));
+        scan.withStopRow(Bytes.toBytes(endRowKey));
+        scan.setFilter(fl);
+        return this.find(tableName,scan,mapper);
+    }
+
     /**
      * @Author lijiale
      * @MethodName find
@@ -90,10 +107,14 @@ public class Hbase implements HbaseOperations{
     **/
     @Override
     public <T> List<T> find(String tableName, String startRowKey, String endRowKey, RowMapper<T> action) {
+        FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        RegexStringComparator rc = new RegexStringComparator("[^\\\\\\/\\^]");
+        RowFilter rf = new RowFilter(CompareOperator.EQUAL,rc);
+        fl.addFilter(rf);
         Scan scan = new Scan();
         scan.withStartRow(Bytes.toBytes(startRowKey));
         scan.withStopRow(Bytes.toBytes(endRowKey), true);
-        scan.setCaching(10000);
+        scan.setFilter(fl);
         return this.find(tableName,scan,action);
     }
 
@@ -199,7 +220,7 @@ public class Hbase implements HbaseOperations{
                         this.hBaseAdmin = this.connection.getAdmin();
                     }catch (Exception e){
                         log.error("hbase connection资源池创建失败");
-                        new QueryException(e);
+                        new QueryException("hbase connection资源池创建失败");
                     }
                 }
             }

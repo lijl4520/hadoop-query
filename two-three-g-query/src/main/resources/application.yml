@@ -5,10 +5,10 @@ hadoop:
         zookeeper_quorum: hebsjzx-schbase-master-47-158,hebsjzx-schbase-master-47-75,hebsjzx-schbase-master-47-96 #zk��Ⱥ��ַ
     kerberos:
       config:
-        keytab-path: /home/bdi/api/cmit_wzzjc_wzjd.keytab #keytab文件路径
-        kerberos-conf-path: /home/bdi/api/krb5.conf #krb5
-        kerberos-user: cmit_wzzjc_wzjd #zk用户
-        zookeeper-default-server-principal: cmit_wzzjc_wzjd@SCKDC #zk主体
+        keytab-path: /home/api/cfg/production.keytab #keytab文件路径
+        kerberos-conf-path: /home/api/cfg/krb5.conf #krb5
+        kerberos-user: production #zk用户
+        zookeeper-default-server-principal: production@SCKDC #zk主体
         principal: hbase/_HOST@SCKDC #hbase主体
         znode-parent: /hbase-secure
 thread-pool:

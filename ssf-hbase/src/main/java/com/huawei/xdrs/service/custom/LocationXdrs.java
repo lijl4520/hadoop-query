@@ -6,14 +6,11 @@ package com.huawei.xdrs.service.custom;
 
 import com.huawei.commons.domain.annotation.ActionService;
 import com.huawei.commons.service.BaseService;
-import com.huawei.commons.service.Hbase;
 import com.huawei.commons.service.HbaseOperations;
 import com.huawei.xdrs.domain.rest.RequestBodyEntity;
 import com.huawei.xdrs.service.Xdrs;
-import org.apache.hadoop.hbase.client.Result;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * LocationXdrs
@@ -21,7 +18,7 @@ import java.util.Map;
  * @since 2021/9/2
  */
 @ActionService(value = "mme")
-public class LocationXdrs extends Xdrs implements BaseService<RequestBodyEntity> {
+public class LocationXdrs extends Xdrs implements BaseService<Object,RequestBodyEntity> {
 
     /**
      * @Author Lijl
@@ -37,8 +34,7 @@ public class LocationXdrs extends Xdrs implements BaseService<RequestBodyEntity>
         List<String> tableNames = super.getTableNameList(requestBody, "S1MME");
         List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(requestBody);
         HbaseOperations hbase = super.hbaseManager.getHbaseInstance();
-        List<Result> resultList = super.queryTaskManager.query(hbase, tableNames, startAndEndRowKeys);
-        List<Map<String, Object>> dataList = super.toMapList(resultList);
-        return dataList;
+        List resultList = super.queryTaskManager.query(hbase, requestBody.getProvince(), tableNames, startAndEndRowKeys);
+        return resultList;
     }
 }

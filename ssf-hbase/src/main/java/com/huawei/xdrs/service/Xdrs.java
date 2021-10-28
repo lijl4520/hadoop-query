@@ -10,9 +10,6 @@ import com.huawei.commons.service.EncryAndDecryService;
 import com.huawei.commons.service.HbaseManager;
 import com.huawei.commons.service.QueryTaskManager;
 import com.huawei.xdrs.domain.rest.RequestBodyEntity;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneId;
@@ -62,9 +59,14 @@ public abstract class Xdrs {
      * @param prefix HBase表名前缀
      * @return: java.util.List<java.lang.String>
     **/
-    protected List<String> getTableNameList(RequestBodyEntity requestBodyEntity, String prefix){
+    protected List<String> getTableNameList(RequestBodyEntity requestBodyEntity, final String prefix){
         List<String> tableNames = router.getTableNames(requestBodyEntity);
-        return tableNames.stream().map(suffix -> prefix+suffix).collect(Collectors.toList());
+        return tableNames.stream().map(suffix ->
+                new StringBuilder("DETAIL_HW:")
+                        .append(prefix)
+                        .append(suffix)
+                        .toString())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -105,54 +107,8 @@ public abstract class Xdrs {
                         .atZone(ZoneId.of("Asia/Shanghai"))
                         .toInstant()
                         .toEpochMilli());
-        String province = requestBody.getProvince();
-        if (province!=null&&!"".equals(province)){
-            startRowKeySb.append("_")
-                    .append(province);
-            endRowKeySb.append("_")
-                    .append(province);
-        }
-        String city = requestBody.getCity();
-        if (city!=null&&!"".equals(city)){
-            startRowKeySb.append("_").append(city);
-            endRowKeySb.append("_").append(city);
-        }
         rowKeyList.add(startRowKeySb.toString());
         rowKeyList.add(endRowKeySb.toString());
         return rowKeyList;
-    }
-
-    /**
-     * @Author lijiale
-     * @MethodName toMapList
-     * @Description 将查询出来的数据流转换成可读对象
-     * @Date 10:13 2021/9/13
-     * @Version 1.0
-     * @param resultList
-     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
-    **/
-    protected List<Map<String,Object>> toMapList(List<Result> resultList){
-        if (resultList.size()>10000){
-            Asserts.fail(ResultCode.DATA_EXCESS);
-        }
-        List<Map<String,Object>> dataList;
-        if (resultList!=null){
-            dataList = new ArrayList<>();
-            for (Result result : resultList) {
-                Map<String,Object> resultMap = new HashMap<String,Object>(16);
-                List<Cell> cells = result.listCells();
-                if (cells!=null && cells.size()>0){
-                    for (int i = 0; i < cells.size(); i++) {
-                        Cell cell = cells.get(i);
-                        resultMap.put(Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength()),
-                                Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength())
-                        );
-                    }
-                    dataList.add(resultMap);
-                }
-            }
-            return dataList;
-        }
-        return null;
     }
 }

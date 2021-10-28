@@ -5,7 +5,6 @@
 package com.huawei.querys.domain.rest;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.huawei.commons.domain.rest.BaseEntity;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
  * @Version 1.0
  */
 @Data
-public class RestBodyEntity implements BaseEntity {
+public class RestBodyEntity implements Serializable{
     private String msisdn;
     private String imsi;
     private String imei;

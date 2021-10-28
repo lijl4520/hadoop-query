@@ -15,7 +15,7 @@ import com.huawei.xdrs.service.Xdrs;
  * @since 2021/9/2
  */
 @ActionService(value = "ims")
-public class ImsXdrs extends Xdrs implements BaseService<RequestBodyEntity> {
+public class ImsXdrs extends Xdrs implements BaseService<Object,RequestBodyEntity> {
 
     @Override
     public Object actionMethod(RequestBodyEntity requestBodyEntity) {
