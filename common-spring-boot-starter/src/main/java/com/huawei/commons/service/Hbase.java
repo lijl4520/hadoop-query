@@ -81,6 +81,19 @@ public class Hbase implements HbaseOperations{
         }
     }
 
+    /**
+     * @Author lijiale
+     * @MethodName find
+     * @Description Hbase 查询
+     * @Date 17:24 2021/10/25
+     * @Version 1.0
+     * @param tableName
+     * @param startRowKey
+     * @param endRowKey
+     * @param filterVal
+     * @param mapper
+     * @return: java.util.List<T>
+     **/
     @Override
     public <T> List<T> find(String tableName, String startRowKey, String endRowKey, String filterVal, RowMapper<T> mapper) {
         FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL);
@@ -132,6 +145,7 @@ public class Hbase implements HbaseOperations{
     @Override
     public <T> List<T> find(String tableName, Scan scan, RowMapper<T> action) {
         return this.execute(tableName, table -> {
+            long startTime = System.currentTimeMillis();
             int caching = scan.getCaching();
             if (caching==1){
                 scan.setCaching(10000);
@@ -145,6 +159,8 @@ public class Hbase implements HbaseOperations{
                     Result next = resultIterator.next();
                     rs.add(action.mapRow(next));
                 }
+                long endTime = System.currentTimeMillis();
+                log.info("线程:{}--->查询Hbase:{}表，共查询了{}条数据--->耗时:{}",Thread.currentThread().getName(),tableName,rs.size(),endTime-startTime);
                 return rs;
             }finally {
                 resultScanner.close();

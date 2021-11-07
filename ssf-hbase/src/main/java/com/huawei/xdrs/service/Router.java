@@ -4,6 +4,7 @@
 
 package com.huawei.xdrs.service;
 
+import com.huawei.commons.exception.Asserts;
 import com.huawei.xdrs.domain.BaseProperties;
 import com.huawei.xdrs.domain.NewerTimeIntervalProperties;
 import com.huawei.xdrs.domain.OldTimeIntervalProperties;
@@ -67,11 +68,19 @@ public class Router {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime stDate = requestBodyEntity.getStartTime();
         LocalDateTime edDate = requestBodyEntity.getEndTime();
-        LocalDateTime ettDate = LocalDateTime.parse(effectiveTime + "000000", dtf);
-        if (stDate.isAfter(ettDate) || stDate.isEqual(ettDate)){
+        if (!(edDate.isEqual(stDate) || edDate.isAfter(stDate))){
+            Asserts.fail("开始时间不得大于结束时间");
+        }
+        LocalDateTime ettDate = null;
+        boolean bol = false;
+        if (effectiveTime!=null){
+            ettDate = LocalDateTime.parse(effectiveTime + "000000", dtf);
+            bol = true;
+        }
+        if (bol && stDate.isAfter(ettDate) && stDate.isEqual(ettDate)){
             getTableNames(stDate,edDate,newerTimeInterval,tableNames);
             careteExpandTable(tableNames,newerTimeInterval,false,null,null,null);
-        }else if (edDate.isAfter(ettDate) || edDate.isEqual(ettDate)){
+        }else if (bol && edDate.isAfter(ettDate) && edDate.isEqual(ettDate)){
             getTableNames(stDate,ettDate.minusMinutes(1),oldTimeInterval,tableNames);
             getTableNames(ettDate,edDate,newerTimeInterval,tableNames);
             careteExpandTable(tableNames,newerTimeInterval,false,null,null,null);
@@ -153,7 +162,7 @@ public class Router {
      * @return: java.util.List<java.lang.String>
     **/
     public List<String> getTableNames(LocalDateTime stDate, LocalDateTime edDate, List<? extends BaseProperties> timeIntervalList, List<String> tableNames){
-        long between = ChronoUnit.DAYS.between(stDate, edDate);
+        long between = computeDay(stDate,edDate);
         if (between==0){
             calculateDateStr(stDate,edDate,tableNames,timeIntervalList);
         }else{
@@ -175,6 +184,26 @@ public class Router {
             }
         }
         return tableNames;
+    }
+
+    /**
+     * @Author lijiale
+     * @MethodName computeDay
+     * @Description 计算跨多少天
+     * @Date 15:42 2021/10/28
+     * @Version 1.0
+     * @param stDate
+     * @param edDate
+     * @return: long
+    **/
+    private long computeDay(LocalDateTime stDate, LocalDateTime edDate) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String stStr = dtf.format(stDate);
+        String edStr = dtf.format(edDate);
+        LocalDate staDate = LocalDate.parse(stStr, dtf);
+        LocalDate endDate = LocalDate.parse(edStr, dtf);
+        long between = ChronoUnit.DAYS.between(staDate, endDate);
+        return between;
     }
 
     /**

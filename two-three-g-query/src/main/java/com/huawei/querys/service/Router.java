@@ -7,7 +7,9 @@ package com.huawei.querys.service;
 import com.huawei.querys.domain.rest.RestBodyEntity;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +65,7 @@ public class Router {
      * @return: java.util.List<java.lang.String>
     **/
     public List<String> getTableNames(LocalDateTime stDate, LocalDateTime edDate, List<String> tableNames){
-        long between = ChronoUnit.DAYS.between(stDate, edDate);
+        long between = computeDay(stDate,edDate);;
         if (between==0){
             calculateDateStr(stDate,tableNames);
         }else{
@@ -73,6 +75,26 @@ public class Router {
             }
         }
         return tableNames;
+    }
+
+    /**
+     * @Author lijiale
+     * @MethodName computeDay
+     * @Description 计算相差天数
+     * @Date 17:11 2021/10/28
+     * @Version 1.0
+     * @param stDate
+     * @param edDate
+     * @return: long
+    **/
+    private long computeDay(LocalDateTime stDate, LocalDateTime edDate) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String stStr = dtf.format(stDate);
+        String edStr = dtf.format(edDate);
+        LocalDate staDate = LocalDate.parse(stStr, dtf);
+        LocalDate endDate = LocalDate.parse(edStr, dtf);
+        long between = ChronoUnit.DAYS.between(staDate, endDate);
+        return between;
     }
 
     /**
@@ -86,10 +108,8 @@ public class Router {
      * @return: void
     **/
     private void calculateDateStr(LocalDateTime stDateFl,List<String> tableNames){
-        int year = stDateFl.getYear();
-        int month = stDateFl.getMonth().getValue();
-        int day = stDateFl.getDayOfMonth();
-        String str = "_"+year+(month<=9?"0"+month:month)+(day<=9?"0"+day:day)+"_0024";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String str = "_"+formatter.format(stDateFl)+"_0024";
         tableNames.add(str);
     }
 }

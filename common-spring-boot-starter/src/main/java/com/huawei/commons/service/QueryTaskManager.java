@@ -35,13 +35,13 @@ public class QueryTaskManager {
         long startTime = System.currentTimeMillis();
         List query = query(hbase, filterVal, tableNameList, startAndEndRowKeyList.get(0), startAndEndRowKeyList.get(1));
         long endTime = System.currentTimeMillis();
-        log.info("线程->{},查询耗时:{}秒",Thread.currentThread().getName(),(endTime-startTime)/1000);
+        log.info("线程->{},查询耗时:{}豪秒",Thread.currentThread().getName(),endTime-startTime);
         if (query!=null){
             if (query.size()>10000){
                 Asserts.fail(ResultCode.DATA_EXCESS);
             }
         }else{
-            Asserts.fail(ResultCode.FAILED);
+            Asserts.fail("查询结果错误");
         }
         return query;
     }
@@ -52,12 +52,17 @@ public class QueryTaskManager {
         for (String tableName : tableNameList) {
             QueryTask queryTask = new QueryTask(hbase, tableName, startRowKey, endRowKey,filterVal,new MapRowMapper());
             try {
-                Future future = executorService.submit(queryTask);
-                List list = (List) future.get();
-                resultList.addAll(list);
-            } catch (InterruptedException e) {
-                Asserts.fail(ResultCode.FAILED);
-            } catch (ExecutionException e) {
+                if(resultList.size()<=10000){
+                    Future future = executorService.submit(queryTask);
+                    List list = (List) future.get();
+                    if (list!=null&&list.size()>0){
+                        resultList.addAll(list);
+                    }
+                }else{
+                    Asserts.fail(ResultCode.DATA_EXCESS);
+                    break;
+                }
+            } catch (Exception e) {
                 Asserts.fail(ResultCode.FAILED);
             }
         }

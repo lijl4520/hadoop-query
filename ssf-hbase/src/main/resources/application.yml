@@ -21,7 +21,7 @@ encryp-decryp:
   url: http://10.252.15.211:9010/Adapter/getKey.do #sm4 加解密服务地址
 xdr:
   router-config:
-    effective-time: 20210909 #建表规则生效时间
+    #effective-time: 20210909 #建表规则生效时间
     old-time-interval: #旧规则-生效时间之前的规则
       - start-date: 00
         end-date: 08

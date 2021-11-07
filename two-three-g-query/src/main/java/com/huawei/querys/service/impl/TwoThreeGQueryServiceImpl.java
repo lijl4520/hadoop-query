@@ -10,7 +10,16 @@ import com.huawei.querys.domain.rest.RestBodyEntity;
 import com.huawei.querys.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -29,6 +38,7 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
     public void setHbaseManager(HbaseManager hbaseManager) {
         this.hbaseManager = hbaseManager;
     }
+
     private QueryTaskManager queryTaskManager;
 
     @Autowired
@@ -41,7 +51,32 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
         List<String> tableNameList = super.getTableNameList(restBodyEntity,"GN");
         List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(restBodyEntity);
         HbaseOperations hbase = this.hbaseManager.getHbaseInstance();
-        List resultList = this.queryTaskManager.query(hbase,null, tableNameList, startAndEndRowKeys);
+        List<Map<String,Object>> resultList = this.queryTaskManager.query(hbase,null, tableNameList, startAndEndRowKeys);
+        if (resultList!=null){
+            List list = new ArrayList();
+            resultList.forEach(map -> {
+                Map<String,Object> fm = new HashMap<>(5);
+                map.forEach((k,v) ->{
+                    if ("c2".equals(k)){
+                        fm.put("version",v);
+                    }
+                    if ("c3".equals(k)){
+                        fm.put("prorocol",v);
+                    }
+                    if ("c4".equals(k)){
+                        fm.put("IMSI",v);
+                    }
+                    if ("c5".equals(k)){
+                        fm.put("IMEI",v);
+                    }
+                    if ("c6".equals(k)){
+                        fm.put("dataContent",v);
+                    }
+                });
+                list.add(fm);
+            });
+            return list;
+        }
         return resultList;
     }
 }
