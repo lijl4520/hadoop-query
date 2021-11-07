@@ -6,14 +6,13 @@ package com.huawei.commons.manager;
 
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.commons.domain.annotation.ActionService;
-import com.huawei.commons.domain.code.ResultCode;
-import com.huawei.commons.domain.rest.BaseEntity;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.service.BaseService;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -52,21 +51,25 @@ public class BaseServiceManager{
         public Builder action(String action){
             BaseService baseService = baseServiceMap.get(action);
             if (baseService==null){
-                Asserts.fail(ResultCode.FAILED);
+                Asserts.fail("服务不存在");
             }
             this.baseService = baseService;
             return this;
         }
 
-        public Builder json(JSONObject json){
+        public Builder object(JSONObject json){
             this.json = json;
+            if (json==null){
+                Asserts.fail("参数为空");
+            }
             return this;
         }
 
         public Object build(){
-            Method method = this.baseService.getClass().getMethods()[0];
-            Class<?> parameterType = method.getParameterTypes()[0];
-            return BaseServiceManager.data(this.baseService.actionMethod(this.json.toJavaObject((Type) parameterType)));
+            Class<? extends BaseService> aClass = this.baseService.getClass();
+            ParameterizedType parameterizedType = (ParameterizedType) aClass.getGenericInterfaces()[0];
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            return BaseServiceManager.data(this.baseService.actionMethod(this.json.toJavaObject(actualTypeArguments[1])));
         }
     }
 }

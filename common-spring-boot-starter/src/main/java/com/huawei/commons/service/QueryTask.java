@@ -29,6 +29,8 @@ public class QueryTask implements Callable {
 
     private RowMapper rowMapper;
 
+    private String filterVal;
+
     /**
      * 构造函数
      *
@@ -38,18 +40,21 @@ public class QueryTask implements Callable {
      * @param endRowKey   endRowKey
      */
     public QueryTask(HbaseOperations hbase, String tableName, String startRowKey,
-                     String endRowKey,RowMapper rowMapper) {
+                     String endRowKey,String filterVal,RowMapper rowMapper) {
         this.hbase = hbase;
         this.tableName = tableName;
         this.startRowKey = startRowKey;
         this.endRowKey = endRowKey;
+        this.filterVal = filterVal;
         this.rowMapper = rowMapper;
     }
 
     @Override
     public Object call() {
-        //List<Result> list = hbase.scanRowkeyRange(this.tableName, this.startRowKey, this.endRowKey);
-        List<Map> list = hbase.find(this.tableName, this.startRowKey, this.endRowKey, this.rowMapper);
-        return list;
+        if (this.filterVal==null){
+            return hbase.find(this.tableName, this.startRowKey, this.endRowKey, this.rowMapper);
+        }else{
+            return hbase.find(this.tableName, this.startRowKey, this.endRowKey, this.filterVal ,this.rowMapper);
+        }
     }
 }

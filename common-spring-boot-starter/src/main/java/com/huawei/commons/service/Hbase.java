@@ -9,9 +9,14 @@ import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.exception.QueryException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.CompareOperator;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
+import org.apache.hadoop.hbase.filter.RowFilter;
+import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.util.Assert;
 
@@ -85,15 +90,44 @@ public class Hbase implements HbaseOperations{
      * @param tableName
      * @param startRowKey
      * @param endRowKey
+     * @param filterVal
+     * @param mapper
+     * @return: java.util.List<T>
+     **/
+    @Override
+    public <T> List<T> find(String tableName, String startRowKey, String endRowKey, String filterVal, RowMapper<T> mapper) {
+        FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        RowFilter rf = new RowFilter(CompareOperator.EQUAL,new SubstringComparator(filterVal));
+        fl.addFilter(rf);
+        Scan scan = new Scan();
+        scan.withStartRow(Bytes.toBytes(startRowKey));
+        scan.withStopRow(Bytes.toBytes(endRowKey));
+        scan.setFilter(fl);
+        return this.find(tableName,scan,mapper);
+    }
+
+    /**
+     * @Author lijiale
+     * @MethodName find
+     * @Description Hbase 查询
+     * @Date 17:24 2021/10/25
+     * @Version 1.0
+     * @param tableName
+     * @param startRowKey
+     * @param endRowKey
      * @param action
      * @return: java.util.List<T>
     **/
     @Override
     public <T> List<T> find(String tableName, String startRowKey, String endRowKey, RowMapper<T> action) {
+        FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        RegexStringComparator rc = new RegexStringComparator("[^\\\\\\/\\^]");
+        RowFilter rf = new RowFilter(CompareOperator.EQUAL,rc);
+        fl.addFilter(rf);
         Scan scan = new Scan();
         scan.withStartRow(Bytes.toBytes(startRowKey));
         scan.withStopRow(Bytes.toBytes(endRowKey), true);
-        scan.setCaching(10000);
+        scan.setFilter(fl);
         return this.find(tableName,scan,action);
     }
 
@@ -111,6 +145,7 @@ public class Hbase implements HbaseOperations{
     @Override
     public <T> List<T> find(String tableName, Scan scan, RowMapper<T> action) {
         return this.execute(tableName, table -> {
+            long startTime = System.currentTimeMillis();
             int caching = scan.getCaching();
             if (caching==1){
                 scan.setCaching(10000);
@@ -124,6 +159,8 @@ public class Hbase implements HbaseOperations{
                     Result next = resultIterator.next();
                     rs.add(action.mapRow(next));
                 }
+                long endTime = System.currentTimeMillis();
+                log.info("线程:{}--->查询Hbase:{}表，共查询了{}条数据--->耗时:{}",Thread.currentThread().getName(),tableName,rs.size(),endTime-startTime);
                 return rs;
             }finally {
                 resultScanner.close();
@@ -199,7 +236,7 @@ public class Hbase implements HbaseOperations{
                         this.hBaseAdmin = this.connection.getAdmin();
                     }catch (Exception e){
                         log.error("hbase connection资源池创建失败");
-                        new QueryException(e);
+                        new QueryException("hbase connection资源池创建失败");
                     }
                 }
             }

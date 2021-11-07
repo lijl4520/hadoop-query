@@ -41,7 +41,7 @@ public class ApiGateway {
         return CommonResult.success(new BaseServiceManager
                 .Builder().
                 action(action).
-                json(jsonObject).
+                object(jsonObject).
                 build());
     }
 }
