@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @Author Lijl
  * @ClassName CommonAutoConfiguration
- * @Description TODO
+ * @Description 自动装载扫描配置
  * @Date 2021/10/14 13:57
  * @Version 1.0
  */

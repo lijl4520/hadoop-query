@@ -9,6 +9,8 @@ import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.service.EncryAndDecryService;
 import com.huawei.querys.domain.rest.RestBodyEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -85,11 +87,14 @@ public abstract class AbstractService {
         }
 
         List<String> rowKeyList = new LinkedList<String>();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
         startRowKeySb.append(cipherText).append("_")
-                .append(dateTimeFormatter.format(restBody.getStartTime()));
+                .append(restBody.getStartTime().atZone(ZoneId.of("Asia/Shanghai"))
+                        .toInstant()
+                        .toEpochMilli());
         endRowKeySb.append(cipherText).append("_")
-                .append(dateTimeFormatter.format(restBody.getEndTime()));
+                .append(restBody.getEndTime().atZone(ZoneId.of("Asia/Shanghai"))
+                        .toInstant()
+                        .toEpochMilli());
         rowKeyList.add(startRowKeySb.toString());
         rowKeyList.add(endRowKeySb.toString());
         return rowKeyList;

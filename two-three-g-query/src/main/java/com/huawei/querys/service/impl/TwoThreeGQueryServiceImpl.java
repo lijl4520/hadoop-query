@@ -51,7 +51,7 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
         List<String> tableNameList = super.getTableNameList(restBodyEntity,"GN");
         List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(restBodyEntity);
         HbaseOperations hbase = this.hbaseManager.getHbaseInstance();
-        List<Map<String,Object>> resultList = this.queryTaskManager.query(hbase,null, tableNameList, startAndEndRowKeys);
+        List<Map<String,Object>> resultList = this.queryTaskManager.query(hbase,restBodyEntity.getProvince(), tableNameList, startAndEndRowKeys);
         if (resultList!=null){
             List list = new ArrayList();
             resultList.forEach(map -> {
@@ -61,7 +61,7 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
                         fm.put("version",v);
                     }
                     if ("c3".equals(k)){
-                        fm.put("prorocol",v);
+                        fm.put("protocol",v);
                     }
                     if ("c4".equals(k)){
                         fm.put("IMSI",v);

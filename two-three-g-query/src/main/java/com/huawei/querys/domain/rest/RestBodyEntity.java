@@ -31,4 +31,6 @@ public class RestBodyEntity implements Serializable{
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyyMMddHHmmss")
     @DateTimeFormat(pattern = "yyyyMMddHHmmss")
     private LocalDateTime endTime;
+
+    private String province;
 }
