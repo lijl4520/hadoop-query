@@ -4,10 +4,8 @@
 
 package com.huawei.commons.service;
 
-import org.apache.hadoop.hbase.client.Result;
+import com.huawei.commons.domain.HbaseInstance;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -25,7 +23,7 @@ public class QueryTask implements Callable {
 
     private String endRowKey;
 
-    private HbaseOperations hbase;
+    private HbaseInstance hbase;
 
     private RowMapper rowMapper;
 
@@ -39,8 +37,8 @@ public class QueryTask implements Callable {
      * @param startRowKey startRowKey
      * @param endRowKey   endRowKey
      */
-    public QueryTask(HbaseOperations hbase, String tableName, String startRowKey,
-                     String endRowKey,String filterVal,RowMapper rowMapper) {
+    public QueryTask(HbaseInstance hbase, String tableName, String startRowKey,
+                     String endRowKey, String filterVal, RowMapper rowMapper) {
         this.hbase = hbase;
         this.tableName = tableName;
         this.startRowKey = startRowKey;
@@ -52,9 +50,9 @@ public class QueryTask implements Callable {
     @Override
     public Object call() {
         if (this.filterVal==null){
-            return hbase.find(this.tableName, this.startRowKey, this.endRowKey, this.rowMapper);
+            return hbase.getHbaseOperations().find(this.tableName, this.startRowKey, this.endRowKey, this.rowMapper);
         }else{
-            return hbase.find(this.tableName, this.startRowKey, this.endRowKey, this.filterVal ,this.rowMapper);
+            return hbase.getHbaseOperations().find(this.tableName, this.startRowKey, this.endRowKey, this.filterVal ,this.rowMapper);
         }
     }
 }

@@ -61,4 +61,6 @@ public interface HbaseOperations {
      * @return: java.util.List<T>
     **/
     <T> List<T> find(String tableName, final Scan scan, final RowMapper<T> mapper);
+
+    HbaseOperations closeConnection();
 }

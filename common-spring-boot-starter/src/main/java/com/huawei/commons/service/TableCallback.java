@@ -22,7 +22,8 @@ public interface TableCallback<T> {
      * @Date 14:29 2021/10/25
      * @Version 1.0
      * @param table
+     * @throws Exception
      * @return: T
     **/
-    T doInTable(Table table) throws Throwable;
+    T doInTable(Table table) throws Exception;
 }

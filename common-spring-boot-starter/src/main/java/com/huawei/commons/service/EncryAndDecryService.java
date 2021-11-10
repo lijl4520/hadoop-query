@@ -9,6 +9,7 @@ import com.huawei.commons.domain.code.ResultCode;
 import com.huawei.commons.encryption.Decnew;
 import com.huawei.commons.encryption.Encrypter;
 import com.huawei.commons.exception.Asserts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import java.time.format.DateTimeFormatter;
  * @Date 2021/10/15 11:31
  * @Version 1.0
  */
+@Slf4j
 @Component
 @EnableConfigurationProperties(EncrypDecrypProperties.class)
 public class EncryAndDecryService {
@@ -49,7 +51,11 @@ public class EncryAndDecryService {
                 LocalDate now = LocalDate.now();
                 DateTimeFormatter ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd");
                 String dateStr = now.format(ofPattern);
-                return Encrypter.encrypt(dateStr, Str, encrypDecrypProperties.getUrl());
+                long startTime = System.currentTimeMillis();
+                String encrypt = Encrypter.encrypt(dateStr, Str, encrypDecrypProperties.getUrl());
+                long endTime = System.currentTimeMillis();
+                log.info("数据加秘密耗时:{}",endTime-startTime);
+                return encrypt;
             }
         }catch (Exception e){
             Asserts.fail(ResultCode.ENCRYP_DECRYP);

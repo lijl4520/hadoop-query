@@ -65,22 +65,4 @@ public class Kerberos {
         }
         log.info("HBase login success.");
     }
-
-
-    /**
-     * * 定时更新凭证
-     */
-    private void startCheckKeytabTgtAndReloginJob() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            try {
-                UserGroupInformation.getLoginUser().checkTGTAndReloginFromKeytab();
-                log.warn("Check Kerberos Tgt And Relogin From Keytab Finish.");
-            } catch (IOException e) {
-                log.error("Check Kerberos Tgt And Relogin From Keytab Error", e);
-            }
-        }, 0, 10, TimeUnit.MINUTES); // 1s 后开始执行，每 3s 执行一次
-        //10分钟循环 达到距离到期时间一定范围就会更新凭证
-        log.warn("Start Check Keytab TGT And Relogin Job Success.");
-    }
 }

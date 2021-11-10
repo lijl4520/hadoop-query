@@ -37,11 +37,11 @@ public class ApiGateway {
     @LoadPointcut
     @PostMapping(value = "/{action}")
     public CommonResult unifiedInlet(@PathVariable String version,@PathVariable String action, @RequestBody JSONObject jsonObject){
-        log.info("========> server {} method {} requestBody:{}",version,action,jsonObject.toString());
+        log.info("========> server {} method {} requestBody:{}",version,action,jsonObject.toJSONString());
         return CommonResult.success(new BaseServiceManager
-                .Builder().
-                action(action).
-                object(jsonObject).
-                build());
+                .Builder()
+                .action(action)
+                .object(jsonObject)
+                .build());
     }
 }

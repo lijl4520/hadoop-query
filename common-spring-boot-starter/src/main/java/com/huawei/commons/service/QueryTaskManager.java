@@ -4,6 +4,7 @@
 
 package com.huawei.commons.service;
 
+import com.huawei.commons.domain.HbaseInstance;
 import com.huawei.commons.domain.code.ResultCode;
 import com.huawei.commons.exception.Asserts;
 import lombok.extern.slf4j.Slf4j;
@@ -31,41 +32,48 @@ public class QueryTaskManager {
         this.executorService = executorService;
     }
 
-    public <T> List<T> query(HbaseOperations hbase, String filterVal, List<String> tableNameList,List<String> startAndEndRowKeyList){
-        long startTime = System.currentTimeMillis();
-        List query = query(hbase, filterVal, tableNameList, startAndEndRowKeyList.get(0), startAndEndRowKeyList.get(1));
-        long endTime = System.currentTimeMillis();
-        log.info("线程->{},查询耗时:{}豪秒",Thread.currentThread().getName(),endTime-startTime);
-        if (query!=null){
-            if (query.size()>10000){
+    private HbaseManager hbaseManager;
+
+    @Autowired
+    public void setHbaseManager(HbaseManager hbaseManager) {
+        this.hbaseManager = hbaseManager;
+    }
+
+    public <T> List<T> query(String filterVal, List<String> tableNameList, List<String> startAndEndRowKeyList){
+        List list = query(filterVal, tableNameList, startAndEndRowKeyList.get(0), startAndEndRowKeyList.get(1));
+        if (list!=null){
+            if (list.size()>10000){
                 Asserts.fail(ResultCode.DATA_EXCESS);
             }
         }else{
             Asserts.fail("查询结果错误");
         }
-        return query;
+        return list;
     }
 
-    private <T> List<T> query(HbaseOperations hbase, String filterVal, List<String> tableNameList, String startRowKey, String endRowKey) {
+    private <T> List<T> query(String filterVal, List<String> tableNameList, String startRowKey, String endRowKey) {
         log.info("=========>StartRowKey:{}/EndRowKey:{}",startRowKey,endRowKey);
-        List resultList = new ArrayList<>();
-        for (String tableName : tableNameList) {
-            QueryTask queryTask = new QueryTask(hbase, tableName, startRowKey, endRowKey,filterVal,new MapRowMapper());
+        List<T> resultList = new ArrayList<>();
+        List<Future<List<T>>> futureList = new ArrayList<>();
+        HbaseInstance hbaseInstance = hbaseManager.getHbaseInstance();
+        tableNameList.forEach(tableName ->{
+            QueryTask queryTask = new QueryTask(hbaseInstance, tableName, startRowKey, endRowKey,filterVal,new MapRowMapper());
             try {
-                if(resultList.size()<=10000){
-                    Future future = executorService.submit(queryTask);
-                    List list = (List) future.get();
-                    if (list!=null&&list.size()>0){
-                        resultList.addAll(list);
-                    }
-                }else{
-                    Asserts.fail(ResultCode.DATA_EXCESS);
-                    break;
-                }
+                futureList.add(executorService.submit(queryTask));
             } catch (Exception e) {
                 Asserts.fail(ResultCode.FAILED);
             }
-        }
+        });
+        futureList.forEach(f ->{
+            try {
+                resultList.addAll(f.get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+        hbaseInstance.setStatus(0);
         return resultList;
     }
 }
