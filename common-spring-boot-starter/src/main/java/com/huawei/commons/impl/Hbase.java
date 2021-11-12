@@ -2,11 +2,12 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.commons.service;
+package com.huawei.commons.impl;
 
 import com.huawei.commons.domain.ZkProperties;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.exception.QueryException;
+import com.huawei.commons.TableCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.CompareOperator;
@@ -20,6 +21,7 @@ import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.util.Assert;
 
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.SynchronousQueue;
@@ -32,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2021/8/30
  */
 @Slf4j
-public class Hbase implements HbaseOperations{
+public class Hbase implements HbaseOperations {
 
     private Configuration configuration;
 
@@ -52,6 +54,7 @@ public class Hbase implements HbaseOperations{
         conf.set("hbase.zookeeper.quorum", hbaseDatasource.getZookeeperQuorum());
         conf.set("zookeeper.znode.parent", "/hbase-secure");
         this.setConfiguration(conf);
+        //getConnection();
         Assert.notNull(conf,"a valid configuration is required");
     }
 
@@ -68,7 +71,7 @@ public class Hbase implements HbaseOperations{
                 Asserts.fail("表名不存在");
             }
             return action.doInTable(table);
-        }catch (Throwable throwable){
+        }catch (Exception e){
             throw new QueryException("其他错误");
         }finally {
             if (null!=table){
@@ -168,63 +171,6 @@ public class Hbase implements HbaseOperations{
         });
     }
 
-
-    /**
-     * HBase查询方法
-     *
-     * @param tableNameStr tableNameStr
-     * @param startRowKey  startRowKey
-     * @param endRowKey    endRowKey
-     * @return List<Result>
-     */
-    public List<Result> scanRowkeyRange(String tableNameStr, String startRowKey,
-                                        String endRowKey) {
-        long strtTime = System.currentTimeMillis();
-        String threadName = Thread.currentThread().getName();
-        log.info("***************  query table {} begin ***************ThreadName:{}*******", tableNameStr,threadName);
-        TableName tableName = TableName.valueOf(tableNameStr);
-        Table table = null;
-        ResultScanner resultScanner = null;
-        List<Result> resultList = new ArrayList<>();
-        Iterator<Result> resultIterator;
-        try {
-            table = connection.getTable(tableName);
-            Scan scan = new Scan();
-            scan.withStartRow(Bytes.toBytes(startRowKey));
-            scan.withStopRow(Bytes.toBytes(endRowKey), true);
-            resultScanner = table.getScanner(scan);
-            resultIterator = resultScanner.iterator();
-            while (resultIterator.hasNext()) {
-                resultList.add(resultIterator.next());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (null != resultScanner) {
-                resultScanner.close();
-            }
-            if (null != table) {
-                try {
-                    table.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (null != connection){
-                try {
-                    connection.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            log.info("***************  query table {} end *************** ThreadName:{} *******", tableNameStr,threadName);
-            long endTime = System.currentTimeMillis();
-            log.warn("*************** query table {} time consuming {} ms ***** ThreadName:{} ******",tableNameStr,endTime-strtTime,threadName);
-        }
-        return resultList;
-    }
-
-
     public Connection getConnection() {
         if (null==this.connection){
             synchronized (this){
@@ -242,6 +188,18 @@ public class Hbase implements HbaseOperations{
             }
         }
         return this.connection;
+    }
+
+    @Override
+    public Hbase closeConnection(){
+        if (this.connection!=null){
+            try {
+                this.connection.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return this;
     }
 
     public void setConnection(Connection connection) {

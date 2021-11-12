@@ -6,10 +6,13 @@ package com.huawei.querys.service;
 
 import com.huawei.commons.domain.code.ResultCode;
 import com.huawei.commons.exception.Asserts;
-import com.huawei.commons.service.EncryAndDecryService;
+import com.huawei.commons.Actuator;
+import com.huawei.commons.encryption.EncryAndDecryService;
+import com.huawei.commons.QueryDataCallback;
 import com.huawei.querys.domain.rest.RestBodyEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.time.format.DateTimeFormatter;
+
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
  * @Date 2021/10/14 16:49
  * @Version 1.0
  */
-public abstract class AbstractService {
+public abstract class AbstractService implements Actuator<RestBodyEntity> {
 
     private Router router;
 
@@ -38,6 +41,23 @@ public abstract class AbstractService {
 
     /**
      * @Author lijiale
+     * @MethodName execute
+     * @Description 获取表名、rowkey,执行查询数据回调
+     * @Date 17:38 2021/11/10
+     * @Version 1.0
+     * @param restBodyEntity
+     * @param callback
+     * @return: T
+    **/
+    @Override
+    public <T> T execute(RestBodyEntity restBodyEntity, QueryDataCallback<T> callback){
+        List<String> tableNameList = this.getTableNameList(restBodyEntity,"GN");
+        List<String> startAndEndRowKeys = this.getStartAndEndRowKeys(restBodyEntity);
+        return callback.doInData(restBodyEntity.getProvince(),tableNameList,startAndEndRowKeys);
+    }
+
+    /**
+     * @Author lijiale
      * @MethodName getTableNameList
      * @Description 获取表名
      * @Date 17:12 2021/10/14
@@ -46,7 +66,7 @@ public abstract class AbstractService {
      * @param prefix
      * @return: java.util.List<java.lang.String>
     **/
-    protected List<String> getTableNameList(RestBodyEntity restBodyEntity, final String prefix){
+    private List<String> getTableNameList(RestBodyEntity restBodyEntity, final String prefix){
         List<String> tableNames = router.getTableNames(restBodyEntity);
         return tableNames.stream().map(suffix ->
                 new StringBuilder("DWA_HW:")
@@ -65,7 +85,7 @@ public abstract class AbstractService {
      * @param restBody
      * @return: java.util.List<java.lang.String>
     **/
-    protected List<String> getStartAndEndRowKeys(RestBodyEntity restBody) {
+    private List<String> getStartAndEndRowKeys(RestBodyEntity restBody) {
         StringBuffer startRowKeySb = new StringBuffer();
         StringBuffer endRowKeySb = new StringBuffer();
         String cellNum = "";
@@ -85,11 +105,14 @@ public abstract class AbstractService {
         }
 
         List<String> rowKeyList = new LinkedList<String>();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
         startRowKeySb.append(cipherText).append("_")
-                .append(dateTimeFormatter.format(restBody.getStartTime()));
+                .append(restBody.getStartTime().atZone(ZoneId.of("Asia/Shanghai"))
+                        .toInstant()
+                        .toEpochMilli());
         endRowKeySb.append(cipherText).append("_")
-                .append(dateTimeFormatter.format(restBody.getEndTime()));
+                .append(restBody.getEndTime().atZone(ZoneId.of("Asia/Shanghai"))
+                        .toInstant()
+                        .toEpochMilli());
         rowKeyList.add(startRowKeySb.toString());
         rowKeyList.add(endRowKeySb.toString());
         return rowKeyList;

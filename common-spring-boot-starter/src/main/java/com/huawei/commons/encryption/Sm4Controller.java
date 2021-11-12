@@ -4,7 +4,6 @@
 
 package com.huawei.commons.encryption;
 
-import com.huawei.commons.service.EncryAndDecryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

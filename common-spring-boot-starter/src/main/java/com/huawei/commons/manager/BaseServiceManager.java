@@ -7,11 +7,11 @@ package com.huawei.commons.manager;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.commons.domain.annotation.ActionService;
 import com.huawei.commons.exception.Asserts;
-import com.huawei.commons.service.BaseService;
+import com.huawei.commons.BaseService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  * @Date 2021/10/19 15:22
  * @Version 1.0
  */
+@Slf4j
 @Component
 public class BaseServiceManager{
 
@@ -66,10 +67,14 @@ public class BaseServiceManager{
         }
 
         public Object build(){
+            long startTime = System.currentTimeMillis();
             Class<? extends BaseService> aClass = this.baseService.getClass();
             ParameterizedType parameterizedType = (ParameterizedType) aClass.getGenericInterfaces()[0];
             Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-            return BaseServiceManager.data(this.baseService.actionMethod(this.json.toJavaObject(actualTypeArguments[1])));
+            Object data = BaseServiceManager.data(this.baseService.actionMethod(this.json.toJavaObject(actualTypeArguments[1])));
+            long endTime = System.currentTimeMillis();
+            log.info("线程->{},查询耗时:{}毫秒",Thread.currentThread().getName(),endTime-startTime);
+            return data;
         }
     }
 }

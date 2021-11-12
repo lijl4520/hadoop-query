@@ -2,7 +2,7 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.commons.service;
+package com.huawei.commons.impl;
 
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Result;
@@ -19,7 +19,7 @@ import java.util.Map;
  * @Date 2021/10/25 15:42
  * @Version 1.0
  */
-public class MapRowMapper implements RowMapper<Map>{
+public class MapRowMapper implements RowMapper<Map> {
     @Override
     public Map mapRow(Result result) throws Exception {
         Map<String,Object> map = new HashMap<>(16);

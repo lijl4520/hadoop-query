@@ -16,8 +16,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "thread-pool")
 public class ThreadPoolProperties {
-    private final int CORE_POOL_SIZE = 3;
-    private final int MAX_POOL_SIZE = 10;
+    private int _cpu = Runtime.getRuntime().availableProcessors();
+    private final int CORE_POOL_SIZE = _cpu+1;
+    private final int MAX_POOL_SIZE = _cpu+10;
     private final int QUEUE_CAPACITY = 512;
     private final int KEEP_ALICE_SECONDS = 10;
     private final String THREAD_NAME_PREFIX = "query-hbase-thread-pool-%d";

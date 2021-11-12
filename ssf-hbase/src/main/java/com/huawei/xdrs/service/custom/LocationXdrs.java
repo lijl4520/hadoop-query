@@ -5,12 +5,12 @@
 package com.huawei.xdrs.service.custom;
 
 import com.huawei.commons.domain.annotation.ActionService;
-import com.huawei.commons.service.BaseService;
-import com.huawei.commons.service.HbaseOperations;
+import com.huawei.commons.manager.QueryTaskManager;
+import com.huawei.commons.BaseService;
 import com.huawei.xdrs.domain.rest.RequestBodyEntity;
 import com.huawei.xdrs.service.Xdrs;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 
 /**
  * LocationXdrs
@@ -19,6 +19,13 @@ import java.util.List;
  */
 @ActionService(value = "mme")
 public class LocationXdrs extends Xdrs implements BaseService<Object,RequestBodyEntity> {
+
+    private QueryTaskManager queryTaskManager;
+
+    @Autowired
+    public void setQueryTaskManager(QueryTaskManager queryTaskManager) {
+        this.queryTaskManager = queryTaskManager;
+    }
 
     /**
      * @Author Lijl
@@ -31,10 +38,6 @@ public class LocationXdrs extends Xdrs implements BaseService<Object,RequestBody
     **/
     @Override
     public Object actionMethod(RequestBodyEntity requestBody) {
-        List<String> tableNames = super.getTableNameList(requestBody, "S1MME");
-        List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(requestBody);
-        HbaseOperations hbase = super.hbaseManager.getHbaseInstance();
-        List resultList = super.queryTaskManager.query(hbase, requestBody.getProvince(), tableNames, startAndEndRowKeys);
-        return resultList;
+        return super.execute(requestBody,(province, tableNameList, startAndEndRowKeys) -> queryTaskManager.query(province, tableNameList, startAndEndRowKeys));
     }
 }
