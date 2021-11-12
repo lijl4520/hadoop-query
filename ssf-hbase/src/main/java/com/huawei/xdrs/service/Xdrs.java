@@ -4,11 +4,11 @@
 
 package com.huawei.xdrs.service;
 
+import com.huawei.commons.Actuator;
 import com.huawei.commons.domain.code.ResultCode;
+import com.huawei.commons.encryption.EncryAndDecryService;
 import com.huawei.commons.exception.Asserts;
-import com.huawei.commons.service.EncryAndDecryService;
-import com.huawei.commons.service.HbaseManager;
-import com.huawei.commons.service.QueryTaskManager;
+import com.huawei.commons.QueryDataCallback;
 import com.huawei.xdrs.domain.rest.RequestBodyEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,25 +21,13 @@ import java.util.stream.Collectors;
  *
  * @since 2021/9/2
  */
-public abstract class Xdrs {
+public abstract class Xdrs implements Actuator<RequestBodyEntity> {
 
     private Router router;
-
-    protected HbaseManager hbaseManager;
-
-    protected QueryTaskManager queryTaskManager;
 
     @Autowired
     public void setRouter(Router router) {
         this.router = router;
-    }
-    @Autowired
-    public void setHbaseManager(HbaseManager hbaseManager) {
-        this.hbaseManager = hbaseManager;
-    }
-    @Autowired
-    public void setQueryTaskManager(QueryTaskManager queryTaskManager) {
-        this.queryTaskManager = queryTaskManager;
     }
 
     private EncryAndDecryService encryAndDecryService;
@@ -47,6 +35,13 @@ public abstract class Xdrs {
     @Autowired
     public void setEncryAndDecryService(EncryAndDecryService encryAndDecryService) {
         this.encryAndDecryService = encryAndDecryService;
+    }
+
+    @Override
+    public <T> T execute(RequestBodyEntity requestBodyEntity, QueryDataCallback<T> callback) {
+        List<String> tableNames = this.getTableNameList(requestBodyEntity, "S1MME");
+        List<String> startAndEndRowKeys = this.getStartAndEndRowKeys(requestBodyEntity);
+        return callback.doInData(requestBodyEntity.getProvince(), tableNames,startAndEndRowKeys);
     }
 
     /**
@@ -59,7 +54,7 @@ public abstract class Xdrs {
      * @param prefix HBase表名前缀
      * @return: java.util.List<java.lang.String>
     **/
-    protected List<String> getTableNameList(RequestBodyEntity requestBodyEntity, final String prefix){
+    private List<String> getTableNameList(RequestBodyEntity requestBodyEntity, final String prefix){
         List<String> tableNames = router.getTableNames(requestBodyEntity);
         return tableNames.stream().map(suffix ->
                 new StringBuilder("DETAIL_HW:")
@@ -78,7 +73,7 @@ public abstract class Xdrs {
      * @param requestBody 入参实体
      * @return: java.util.List<java.lang.String>
     **/
-    protected List<String> getStartAndEndRowKeys(RequestBodyEntity requestBody) {
+    private List<String> getStartAndEndRowKeys(RequestBodyEntity requestBody) {
         StringBuffer startRowKeySb = new StringBuffer();
         StringBuffer endRowKeySb = new StringBuffer();
         String cellNum = "";

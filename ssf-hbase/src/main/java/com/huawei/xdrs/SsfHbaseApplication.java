@@ -9,5 +9,4 @@ public class SsfHbaseApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SsfHbaseApplication.class, args);
 	}
-
 }

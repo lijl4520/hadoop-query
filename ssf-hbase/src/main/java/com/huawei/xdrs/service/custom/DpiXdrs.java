@@ -5,7 +5,7 @@
 package com.huawei.xdrs.service.custom;
 
 import com.huawei.commons.domain.annotation.ActionService;
-import com.huawei.commons.service.BaseService;
+import com.huawei.commons.BaseService;
 import com.huawei.xdrs.domain.rest.RequestBodyEntity;
 import com.huawei.xdrs.service.Xdrs;
 
