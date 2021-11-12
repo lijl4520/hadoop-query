@@ -2,11 +2,12 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.commons.service;
+package com.huawei.commons.impl;
 
 import com.huawei.commons.domain.ZkProperties;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.exception.QueryException;
+import com.huawei.commons.TableCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.CompareOperator;
@@ -20,6 +21,7 @@ import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.util.Assert;
 
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.SynchronousQueue;
@@ -32,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2021/8/30
  */
 @Slf4j
-public class Hbase implements HbaseOperations{
+public class Hbase implements HbaseOperations {
 
     private Configuration configuration;
 

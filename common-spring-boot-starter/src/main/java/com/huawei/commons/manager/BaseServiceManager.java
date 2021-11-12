@@ -7,12 +7,11 @@ package com.huawei.commons.manager;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.commons.domain.annotation.ActionService;
 import com.huawei.commons.exception.Asserts;
-import com.huawei.commons.service.BaseService;
+import com.huawei.commons.BaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;

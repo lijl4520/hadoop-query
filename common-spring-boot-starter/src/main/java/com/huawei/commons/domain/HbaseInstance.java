@@ -4,7 +4,7 @@
 
 package com.huawei.commons.domain;
 
-import com.huawei.commons.service.HbaseOperations;
+import com.huawei.commons.impl.HbaseOperations;
 import lombok.Data;
 
 import java.util.Date;

@@ -2,7 +2,7 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.commons.service;
+package com.huawei.commons.encryption;
 
 import com.huawei.commons.domain.EncrypDecrypProperties;
 import com.huawei.commons.domain.code.ResultCode;
@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @Author Lijl
  * @ClassName EncryAndDecryService
- * @Description TODO
+ * @Description 加解密
  * @Date 2021/10/15 11:31
  * @Version 1.0
  */

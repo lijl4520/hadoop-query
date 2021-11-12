@@ -2,14 +2,14 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.commons.service;
+package com.huawei.commons;
 
 import java.util.List;
 
 /**
  * @Author Lijl
  * @ClassName QueryDataCallback
- * @Description TODO
+ * @Description 查询结果回调
  * @Date 2021/11/10 14:55
  * @Version 1.0
  */

@@ -2,8 +2,9 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.commons.service;
+package com.huawei.commons.impl;
 
+import com.huawei.commons.TableCallback;
 import org.apache.hadoop.hbase.client.Scan;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface HbaseOperations {
      * @param action
      * @return: T
     **/
-    <T> T execute(String tableName,TableCallback<T> action);
+    <T> T execute(String tableName, TableCallback<T> action);
 
 
     <T> List<T> find(String tableName,String startRowKey,

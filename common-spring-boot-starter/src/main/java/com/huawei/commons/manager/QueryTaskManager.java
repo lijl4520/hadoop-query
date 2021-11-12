@@ -2,11 +2,13 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
  */
 
-package com.huawei.commons.service;
+package com.huawei.commons.manager;
 
 import com.huawei.commons.domain.HbaseInstance;
 import com.huawei.commons.domain.code.ResultCode;
 import com.huawei.commons.exception.Asserts;
+import com.huawei.commons.impl.MapRowMapper;
+import com.huawei.commons.impl.QueryTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;

@@ -8,8 +8,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.huawei.commons.manager.BaseServiceManager;
 import com.huawei.commons.domain.annotation.LoadPointcut;
 import com.huawei.commons.domain.resp.CommonResult;
+import com.huawei.commons.util.JsonToMap;
+import com.huawei.commons.util.SignUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * @Author Lijl
@@ -31,17 +35,32 @@ public class ApiGateway {
      * @Version 1.0
      * @param version 服务版本号
      * @param action API服务名
-     * @param jsonObject 接口参数
+     * @param json 接口参数
      * @return: com.huawei.commons.domain.resp.CommonResult
     **/
     @LoadPointcut
     @PostMapping(value = "/{action}")
-    public CommonResult unifiedInlet(@PathVariable String version,@PathVariable String action, @RequestBody JSONObject jsonObject){
-        log.info("========> server {} method {} requestBody:{}",version,action,jsonObject.toJSONString());
+    public CommonResult unifiedInlet(@PathVariable String version,@PathVariable String action, @RequestBody JSONObject json){
+        log.info("========> server {} method {} requestBody:{}",version,action,json.toJSONString());
         return CommonResult.success(new BaseServiceManager
                 .Builder()
                 .action(action)
-                .object(jsonObject)
+                .object(json)
                 .build());
+    }
+
+    /**
+     * @Author lijiale
+     * @MethodName generateSign
+     * @Description 生成AK
+     * @Date 16:34 2021/11/11
+     * @Version 1.0
+     * @param json
+     * @return: com.huawei.commons.domain.resp.CommonResult
+    **/
+    @PostMapping(value = "/sign")
+    public CommonResult generateSign(@RequestBody JSONObject json){
+        Map sortedMap = JsonToMap.sortParams(json);
+        return CommonResult.success(SignUtil.wrapperHeader(sortedMap));
     }
 }
