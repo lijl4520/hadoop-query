@@ -1,5 +1,9 @@
 hadoop:
   commons:
+    hbase-resource-pool:
+      core-pool-size: 10
+      max-pool-size: 50
+      idle-time: 30
     zookeeper:
       config:
         zookeeper_quorum: hebsjzx-schbase-master-47-158,hebsjzx-schbase-master-47-75,hebsjzx-schbase-master-47-96 #zk��Ⱥ��ַ
@@ -12,13 +16,17 @@ hadoop:
         principal: hbase/_HOST@SCKDC #hbase主体
         znode-parent: /hbase-secure
 thread-pool:
-  core_pool_size: 3 #初始线程数
-  max_pool_size: 10 #最大线程数
   queue_capacity: 512 #队列数
   keep_alive_seconds: 10 #等待时间
   hread_name_prefix: query-hbase-thread-pool-%d #线程名称
 encryp-decryp:
    url: http://10.252.15.211:9010/Adapter/getKey.do #sm4 加密服务地址
 server:
+  port: 8082
   servlet:
     context-path: /hbase-query
+  ssl:
+    key-store: classpath:.keystore
+    key-alias: tomcathttps
+    key-store-password: 123456
+    key-store-type: JKS

@@ -4,18 +4,13 @@
 
 package com.huawei.querys.service.impl;
 
+import com.huawei.commons.BaseService;
 import com.huawei.commons.domain.annotation.ActionService;
-import com.huawei.commons.service.*;
+import com.huawei.commons.manager.QueryTaskManager;
 import com.huawei.querys.domain.rest.RestBodyEntity;
 import com.huawei.querys.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,13 +27,6 @@ import java.util.Map;
 @ActionService(value = "queryTwoThreeG")
 public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseService<Object,RestBodyEntity> {
 
-    private HbaseManager hbaseManager;
-
-    @Autowired
-    public void setHbaseManager(HbaseManager hbaseManager) {
-        this.hbaseManager = hbaseManager;
-    }
-
     private QueryTaskManager queryTaskManager;
 
     @Autowired
@@ -48,12 +36,39 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
 
     @Override
     public Object actionMethod(RestBodyEntity restBodyEntity) {
-        List<String> tableNameList = super.getTableNameList(restBodyEntity,"GN");
-        List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(restBodyEntity);
-        HbaseOperations hbase = this.hbaseManager.getHbaseInstance();
-        List<Map<String,Object>> resultList = this.queryTaskManager.query(hbase,restBodyEntity.getProvince(), tableNameList, startAndEndRowKeys);
-        if (resultList!=null){
+        return super.execute(restBodyEntity,(province,tableNameList, startAndEndRowKeys) -> {
+            List<Map<String,Object>> resultList = this.queryTaskManager.query(province, tableNameList, startAndEndRowKeys);
             List list = new ArrayList();
+            if (resultList!=null) {
+                resultList.forEach(map -> {
+                    Map<String, Object> fm = new HashMap<>(5);
+                    map.forEach((k, v) -> {
+                        if ("c2".equals(k)) {
+                            fm.put("version", v);
+                        }
+                        if ("c3".equals(k)) {
+                            fm.put("protocol", v);
+                        }
+                        if ("c4".equals(k)) {
+                            fm.put("IMSI", v);
+                        }
+                        if ("c5".equals(k)) {
+                            fm.put("IMEI", v);
+                        }
+                        if ("c6".equals(k)) {
+                            fm.put("dataContent", v);
+                        }
+                    });
+                    list.add(fm);
+                });
+            }
+            return list;
+        });
+        /*List<String> tableNameList = super.getTableNameList(restBodyEntity,"GN");
+        List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(restBodyEntity);
+        List<Map<String,Object>> resultList = this.queryTaskManager.query(restBodyEntity.getProvince(), tableNameList, startAndEndRowKeys);
+        List list = new ArrayList();
+        if (resultList!=null){
             resultList.forEach(map -> {
                 Map<String,Object> fm = new HashMap<>(5);
                 map.forEach((k,v) ->{
@@ -75,8 +90,7 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
                 });
                 list.add(fm);
             });
-            return list;
         }
-        return resultList;
+        return list;*/
     }
 }
