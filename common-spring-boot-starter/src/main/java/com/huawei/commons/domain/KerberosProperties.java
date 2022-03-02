@@ -26,7 +26,6 @@ public class KerberosProperties {
     private String zookeeperServerPrincipalKey = ZOOKEEPER_SERVER_PRINCIPAL_KEY;
     private String zookeeperDefaultServerPrincipal;
     private String principal;
-    private String znodeParent;
 
     public String getKeytabPath() {
         return keytabPath;
@@ -82,13 +81,5 @@ public class KerberosProperties {
 
     public void setPrincipal(String principal) {
         this.principal = principal;
-    }
-
-    public String getZnodeParent() {
-        return znodeParent;
-    }
-
-    public void setZnodeParent(String znodeParent) {
-        this.znodeParent = znodeParent;
     }
 }

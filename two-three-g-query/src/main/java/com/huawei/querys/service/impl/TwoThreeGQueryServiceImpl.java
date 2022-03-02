@@ -6,10 +6,13 @@ package com.huawei.querys.service.impl;
 
 import com.huawei.commons.BaseService;
 import com.huawei.commons.domain.annotation.ActionService;
+import com.huawei.commons.domain.code.ResultCode;
+import com.huawei.commons.exception.QueryException;
 import com.huawei.commons.manager.QueryTaskManager;
 import com.huawei.querys.domain.rest.RestBodyEntity;
 import com.huawei.querys.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +27,7 @@ import java.util.Map;
  * @Date 2021/10/14 16:52
  * @Version 1.0
  */
-@ActionService(value = "queryTwoThreeG")
+@ActionService(value = "gn")
 public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseService<Object,RestBodyEntity> {
 
     private QueryTaskManager queryTaskManager;
@@ -36,61 +39,19 @@ public class TwoThreeGQueryServiceImpl extends AbstractService implements BaseSe
 
     @Override
     public Object actionMethod(RestBodyEntity restBodyEntity) {
-        return super.execute(restBodyEntity,(province,tableNameList, startAndEndRowKeys) -> {
-            List<Map<String,Object>> resultList = this.queryTaskManager.query(province, tableNameList, startAndEndRowKeys);
-            List list = new ArrayList();
-            if (resultList!=null) {
-                resultList.forEach(map -> {
-                    Map<String, Object> fm = new HashMap<>(5);
-                    map.forEach((k, v) -> {
-                        if ("c2".equals(k)) {
-                            fm.put("version", v);
-                        }
-                        if ("c3".equals(k)) {
-                            fm.put("protocol", v);
-                        }
-                        if ("c4".equals(k)) {
-                            fm.put("IMSI", v);
-                        }
-                        if ("c5".equals(k)) {
-                            fm.put("IMEI", v);
-                        }
-                        if ("c6".equals(k)) {
-                            fm.put("dataContent", v);
-                        }
-                    });
-                    list.add(fm);
-                });
-            }
-            return list;
-        });
-        /*List<String> tableNameList = super.getTableNameList(restBodyEntity,"GN");
-        List<String> startAndEndRowKeys = super.getStartAndEndRowKeys(restBodyEntity);
-        List<Map<String,Object>> resultList = this.queryTaskManager.query(restBodyEntity.getProvince(), tableNameList, startAndEndRowKeys);
-        List list = new ArrayList();
-        if (resultList!=null){
-            resultList.forEach(map -> {
-                Map<String,Object> fm = new HashMap<>(5);
-                map.forEach((k,v) ->{
-                    if ("c2".equals(k)){
-                        fm.put("version",v);
-                    }
-                    if ("c3".equals(k)){
-                        fm.put("protocol",v);
-                    }
-                    if ("c4".equals(k)){
-                        fm.put("IMSI",v);
-                    }
-                    if ("c5".equals(k)){
-                        fm.put("IMEI",v);
-                    }
-                    if ("c6".equals(k)){
-                        fm.put("dataContent",v);
-                    }
-                });
-                list.add(fm);
-            });
+        String msisdn = restBodyEntity.getMsisdn();
+        String imsi = restBodyEntity.getImsi();
+        String imei = restBodyEntity.getImei();
+        if (StringUtils.hasLength(msisdn)){
+            return super.execute(restBodyEntity,
+                    (province, tableNameList, startAndEndRowKeys) -> super.mappingField(queryTaskManager.query(province, tableNameList, startAndEndRowKeys))
+
+                    ,"GN","DWA_HW:",null);
+        }else if (StringUtils.hasLength(imsi)||StringUtils.hasLength(imei)){
+            return super.executeIndex(restBodyEntity,
+                    (family, qualifier, startVal, endVal,qualifierAndVal, rowVal, tableNames)->super.mappingField(queryTaskManager.queryIndex(family,qualifier,startVal,endVal,qualifierAndVal,rowVal,tableNames)),
+                    "GN","DWA_HW:",null);
         }
-        return list;*/
+        throw new QueryException(ResultCode.VALIDATE_FAILED);
     }
 }

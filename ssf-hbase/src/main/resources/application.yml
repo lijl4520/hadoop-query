@@ -1,26 +1,22 @@
-server:
-  ssl:
-    key-store: classpath:.keystore
-    key-alias: tomcathttps
-    key-store-password: 123456
-    key-store-type: JKS
 hadoop:
   commons:
     hbase-resource-pool:
-      core_pool_size: 10
-      max_pool_size: 50
-      idle_time: 30
+      core_pool_size: 10 #单集群初始连接数
+      max_pool_size: 50 #单集群最大连接数
+      idle_time: 30 #空闲时间
     zookeeper:
       config:
-        zookeeper_quorum: hebsjzx-schbase-master-47-158,hebsjzx-schbase-master-47-75,hebsjzx-schbase-master-47-96 #zk集群地址
+        - zookeeper_quorum: hebsjzx-schbase-master-47-158,hebsjzx-schbase-master-47-75,hebsjzx-schbase-master-47-96 #zk集群地址
+          znode-parent: /hbase-secure
+          principal: hbase/_HOST@SCKDC #hbase主体
+      config-size: 1 #集群配置数量
+      single-cluster: true #是否单集群
     kerberos:
       config:
         keytab-path: /home/cmit_detail/api/cmit_wzzjc_wzjd.keytab #keytab文件路径
         kerberos-conf-path: /home/cmit_detail/api/krb5.conf #krb5
         kerberos-user: cmit_wzzjc_wzjd #zk用户
         zookeeper-default-server-principal: cmit_wzzjc_wzjd@SCKDC #zk主体
-        principal: hbase/_HOST@SCKDC #hbase主体
-        znode-parent: /hbase-secure
 thread-pool:
   queue_capacity: 512 #队列数
   keep_alive_seconds: 10 #等待时间

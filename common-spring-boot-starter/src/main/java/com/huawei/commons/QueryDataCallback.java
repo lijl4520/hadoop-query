@@ -5,6 +5,7 @@
 package com.huawei.commons;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author Lijl
@@ -13,6 +14,7 @@ import java.util.List;
  * @Date 2021/11/10 14:55
  * @Version 1.0
  */
+@FunctionalInterface
 public interface QueryDataCallback<T> {
 
     T doInData(String province,List<String> tableNameList,List<String> startAndEndRowKeys);

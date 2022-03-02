@@ -4,6 +4,8 @@
 
 package com.huawei.commons;
 
+import com.huawei.commons.domain.AbstractRouterConfig;
+
 /**
  * @Author Lijl
  * @InterfaceName BusinessExcute
@@ -21,7 +23,25 @@ public interface Actuator<R> {
      * @Version 1.0
      * @param r
      * @param callback
+     * @param prefix
+     * @param databaseName
+     * @param routerConfig
      * @return: T
     **/
-    <T> T execute(R r, QueryDataCallback<T> callback);
+    <T> T execute(R r, QueryDataCallback<T> callback, String prefix, String databaseName, AbstractRouterConfig routerConfig);
+
+    /**
+     * @Author lijiale
+     * @MethodName executeIndex
+     * @Description 执行二级索引业务
+     * @Date 9:44 2021/11/11
+     * @Version 1.0
+     * @param r
+     * @param callback
+     * @param prefix
+     * @param databaseName
+     * @param routerConfig
+     * @return: T
+     **/
+    <T> T executeIndex(R r, QueryIndexDataCallback<T> callback, String prefix, String databaseName, AbstractRouterConfig routerConfig);
 }

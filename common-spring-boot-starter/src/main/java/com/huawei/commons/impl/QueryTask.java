@@ -6,6 +6,7 @@ package com.huawei.commons.impl;
 
 import com.huawei.commons.domain.HbaseInstance;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -49,10 +50,13 @@ public class QueryTask implements Callable {
 
     @Override
     public Object call() {
+        List list;
         if (this.filterVal==null){
-            return hbase.getHbaseOperations().find(this.tableName, this.startRowKey, this.endRowKey, this.rowMapper);
+            list = hbase.getHbaseOperations().find(this.tableName, this.startRowKey, this.endRowKey, this.rowMapper);
         }else{
-            return hbase.getHbaseOperations().find(this.tableName, this.startRowKey, this.endRowKey, this.filterVal ,this.rowMapper);
+            list = hbase.getHbaseOperations().find(this.tableName, this.startRowKey, this.endRowKey, this.filterVal, this.rowMapper);
         }
+        hbase.setStatus(0);
+        return list;
     }
 }

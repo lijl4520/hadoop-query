@@ -65,7 +65,7 @@ public class Router {
      * @return: java.util.List<java.lang.String>
     **/
     public List<String> getTableNames(LocalDateTime stDate, LocalDateTime edDate, List<String> tableNames){
-        long between = computeDay(stDate,edDate);;
+        long between = computeDay(stDate,edDate);
         for (long i = 0; i <= between+1L; i++) {
             LocalDateTime localDateTime = stDate;
             if (i>0){

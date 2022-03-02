@@ -38,6 +38,6 @@ public class LocationXdrs extends Xdrs implements BaseService<Object,RequestBody
     **/
     @Override
     public Object actionMethod(RequestBodyEntity requestBody) {
-        return super.execute(requestBody,(province, tableNameList, startAndEndRowKeys) -> queryTaskManager.query(province, tableNameList, startAndEndRowKeys));
+        return super.execute(requestBody,(province, tableNameList, startAndEndRowKeys) -> queryTaskManager.query(province, tableNameList, startAndEndRowKeys),"S1MME","DETAIL_HW:",null);
     }
 }

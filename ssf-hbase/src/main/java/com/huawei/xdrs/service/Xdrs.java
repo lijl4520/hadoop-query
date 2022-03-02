@@ -5,10 +5,11 @@
 package com.huawei.xdrs.service;
 
 import com.huawei.commons.Actuator;
+import com.huawei.commons.domain.AbstractRouterConfig;
 import com.huawei.commons.domain.code.ResultCode;
-import com.huawei.commons.encryption.EncryAndDecryService;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.commons.QueryDataCallback;
+import com.huawei.ende.encryption.EncryAndDecryService;
 import com.huawei.xdrs.domain.rest.RequestBodyEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,8 +39,9 @@ public abstract class Xdrs implements Actuator<RequestBodyEntity> {
     }
 
     @Override
-    public <T> T execute(RequestBodyEntity requestBodyEntity, QueryDataCallback<T> callback) {
-        List<String> tableNames = this.getTableNameList(requestBodyEntity, "S1MME");
+    public <T> T execute(RequestBodyEntity requestBodyEntity, QueryDataCallback<T> callback, String prefix, String databaseName,
+                         AbstractRouterConfig routerConfig) {
+        List<String> tableNames = this.getTableNameList(requestBodyEntity, prefix, databaseName);
         List<String> startAndEndRowKeys = this.getStartAndEndRowKeys(requestBodyEntity);
         return callback.doInData(requestBodyEntity.getProvince(), tableNames,startAndEndRowKeys);
     }
@@ -52,12 +54,13 @@ public abstract class Xdrs implements Actuator<RequestBodyEntity> {
      * @Version 1.0
      * @param requestBodyEntity 查询条件参数
      * @param prefix HBase表名前缀
+     * @param databaseName
      * @return: java.util.List<java.lang.String>
     **/
-    private List<String> getTableNameList(RequestBodyEntity requestBodyEntity, final String prefix){
+    private List<String> getTableNameList(RequestBodyEntity requestBodyEntity, final String prefix, final String databaseName){
         List<String> tableNames = router.getTableNames(requestBodyEntity);
         return tableNames.stream().map(suffix ->
-                new StringBuilder("DETAIL_HW:")
+                new StringBuilder(databaseName)
                         .append(prefix)
                         .append(suffix)
                         .toString())
@@ -92,7 +95,9 @@ public abstract class Xdrs implements Actuator<RequestBodyEntity> {
             Asserts.fail(ResultCode.ENCRYP_DECRYP);
         }
         List<String> rowKeyList = new LinkedList<String>();
-        startRowKeySb.append(cipherText).append("_")
+        startRowKeySb.append(encryAndDecryService.createPrefix(cipherText))
+                .append("_")
+                .append(cipherText).append("_")
                 .append(requestBody.getStartTime()
                         .atZone(ZoneId.of("Asia/Shanghai"))
                         .toInstant()

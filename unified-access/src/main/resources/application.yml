@@ -1,0 +1,8 @@
+server:
+  servlet:
+    context-path: /unified-access
+hbase-client:
+  address:
+    JZH_GN: http://10.252.38.129:8082/hbase-query
+    JZH_MME: http://10.252.30.217:8082
+    ZJ: http://10.250.140.2:8082/cross-cluster

@@ -4,6 +4,7 @@
 
 package com.huawei.xdrs.service;
 
+import com.huawei.commons.domain.AbstractRouterConfig;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.xdrs.domain.BaseProperties;
 import com.huawei.xdrs.domain.NewerTimeIntervalProperties;

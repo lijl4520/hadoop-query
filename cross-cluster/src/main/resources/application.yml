@@ -1,0 +1,159 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /cross-cluster
+hadoop:
+  commons:
+    hbase-resource-pool:
+      core-pool-size: 10
+      max-pool-size: 50
+      idle-time: 30
+    zookeeper:
+      config:
+        - zookeeper_quorum: nbsjzx-1plusn-209-80-198,nbsjzx-1plusn-209-81-174,nbsjzx-1plusn-209-82-89
+          znode-parent: /hbase-secure
+          principal: hbase/_HOST@1PLUSNKDC #hbase主体
+          quorum-name: ZJ
+      config-size: 1
+      single-cluster: true
+    kerberos:
+      config:
+        keytab-path: /etc/security/keytabs/xdr_admin.keytab #keytab文件路径
+        kerberos-conf-path: /etc/security/keytabs/krb5.conf #krb5
+        kerberos-user: xdr_admin #zk用户
+        zookeeper-default-server-principal: xdr_admin@1PLUSNKDC #zk主体
+thread-pool:
+  queue_capacity: 512 #队列数
+  keep_alive_seconds: 10 #等待时间
+  hread_name_prefix: query-hbase-thread-pool-%d #线程名称
+encryp-decryp:
+  url: https://10.246.85.8:8051/USKSP/services/SecretKeyWS?wsdl #sm4 密钥服务地址
+  user-id: oneplusn
+  keystore-file: oneplusn.p12
+  keystore-type: PKCS12
+  keystore-pass: oneplusn123
+  truststore-file: server.keystore
+  truststore-type: jks
+  truststore-pass: Usk@sp123
+  http: false
+router-config:
+  ims:
+    #effective-time: 20210909 #建表规则生效时间
+    old-time-interval: #旧规则-生效时间之前的规则
+      - start-date: 00
+        end-date: 06
+      - start-date: 06
+        end-date: 12
+      - start-date: 12
+        end-date: 18
+      - start-date: 18
+        end-date: 24
+    newer-time-interval: #新规则-生效时间之后的规则
+      - start-date: 00
+        end-date: 10
+      - start-date: 10
+        end-date: 17
+      - start-date: 17
+        end-date: 20
+      - start-date: 20
+        end-date: 24
+  gn:
+    #effective-time: 20210909 #建表规则生效时间
+    old-time-interval: #旧规则-生效时间之前的规则
+      - start-date: 00
+        end-date: 06
+      - start-date: 06
+        end-date: 12
+      - start-date: 12
+        end-date: 18
+      - start-date: 18
+        end-date: 24
+    newer-time-interval: #新规则-生效时间之后的规则
+      - start-date: 00
+        end-date: 10
+      - start-date: 10
+        end-date: 17
+      - start-date: 17
+        end-date: 20
+      - start-date: 20
+        end-date: 24
+  dpi:
+    #effective-time: 20210909 #建表规则生效时间
+    old-time-interval: #旧规则-生效时间之前的规则
+      - start-date: 00
+        end-date: 06
+      - start-date: 06
+        end-date: 12
+      - start-date: 12
+        end-date: 18
+      - start-date: 18
+        end-date: 24
+    newer-time-interval: #新规则-生效时间之后的规则
+      - start-date: 00
+        end-date: 10
+      - start-date: 10
+        end-date: 17
+      - start-date: 17
+        end-date: 20
+      - start-date: 20
+        end-date: 24
+  five_dpi:
+    #effective-time: 20210909 #建表规则生效时间
+    old-time-interval: #旧规则-生效时间之前的规则
+      - start-date: 00
+        end-date: 06
+      - start-date: 06
+        end-date: 12
+      - start-date: 12
+        end-date: 18
+      - start-date: 18
+        end-date: 24
+    newer-time-interval: #新规则-生效时间之后的规则
+      - start-date: 00
+        end-date: 10
+      - start-date: 10
+        end-date: 17
+      - start-date: 17
+        end-date: 20
+      - start-date: 20
+        end-date: 24
+  mme:
+    #effective-time: 20210909 #建表规则生效时间
+    old-time-interval: #旧规则-生效时间之前的规则
+      - start-date: 00
+        end-date: 06
+      - start-date: 06
+        end-date: 12
+      - start-date: 12
+        end-date: 18
+      - start-date: 18
+        end-date: 24
+    newer-time-interval: #新规则-生效时间之后的规则
+      - start-date: 00
+        end-date: 10
+      - start-date: 10
+        end-date: 17
+      - start-date: 17
+        end-date: 20
+      - start-date: 20
+        end-date: 24
+  nx:
+    #effective-time: 20210909 #建表规则生效时间
+    old-time-interval: #旧规则-生效时间之前的规则
+      - start-date: 00
+        end-date: 06
+      - start-date: 06
+        end-date: 12
+      - start-date: 12
+        end-date: 18
+      - start-date: 18
+        end-date: 24
+    newer-time-interval: #新规则-生效时间之后的规则
+      - start-date: 00
+        end-date: 10
+      - start-date: 10
+        end-date: 17
+      - start-date: 17
+        end-date: 20
+      - start-date: 20
+        end-date: 24

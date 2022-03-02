@@ -18,8 +18,17 @@ public class HbaseResourceProperties {
     private final int CORE_POOL_SIZE = 10;
     private final int MAX_POOL_SIZE = 50;
     private final int IDLE_TIME = 30;
+    /**
+     * Number of initial connections
+     */
     private int corePoolSize = CORE_POOL_SIZE;
+    /**
+     * Maximum connection
+     */
     private int maxPoolSize = MAX_POOL_SIZE;
+    /**
+     * Connection idle time
+     */
     private int idleTime = IDLE_TIME;
 
     public int getCorePoolSize() {

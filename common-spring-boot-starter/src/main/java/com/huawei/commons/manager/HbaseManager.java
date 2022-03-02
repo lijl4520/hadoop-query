@@ -7,6 +7,7 @@ package com.huawei.commons.manager;
 import com.huawei.commons.domain.HbaseInstance;
 import com.huawei.commons.domain.HbaseResourceProperties;
 import com.huawei.commons.domain.ZkProperties;
+import com.huawei.commons.domain.ZookpeerConfig;
 import com.huawei.commons.impl.Hbase;
 import com.huawei.commons.impl.HbaseOperations;
 import com.huawei.commons.Kerberos;
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -29,14 +30,14 @@ import java.util.concurrent.*;
  */
 @Slf4j
 @Component
-@EnableConfigurationProperties({ZkProperties.class, HbaseResourceProperties.class})
+@EnableConfigurationProperties({ZookpeerConfig.class, HbaseResourceProperties.class})
 public class HbaseManager implements InitializingBean {
 
-    private ZkProperties zkProperties;
+    private ZookpeerConfig zookpeerConfig;
 
     @Autowired
-    public void setZkProperties(ZkProperties zkProperties) {
-        this.zkProperties = zkProperties;
+    public void setZookpeerConfig(ZookpeerConfig zookpeerConfig) {
+        this.zookpeerConfig = zookpeerConfig;
     }
 
     private HbaseResourceProperties hbaseResourceProperties;
@@ -53,7 +54,7 @@ public class HbaseManager implements InitializingBean {
         this.kerberos = kerberos;
     }
 
-    private CopyOnWriteArrayList<HbaseInstance> list = new CopyOnWriteArrayList<>();
+    private Map<String,CopyOnWriteArrayList<HbaseInstance>> map = new ConcurrentHashMap<>(16);
     private final long timeOut = 1000 * 60 * 60 * 3;
 
     /**
@@ -65,10 +66,10 @@ public class HbaseManager implements InitializingBean {
      * @param
      * @return: com.huawei.commons.domain.HbaseInstance
     **/
-    private HbaseInstance createHbaseInstance(){
+    private HbaseInstance createHbaseInstance(ZkProperties zkProperties){
         HbaseInstance hbaseInstance = new HbaseInstance();
         hbaseInstance.setData(new Date());
-        hbaseInstance.setHbaseOperations(getHbaseOperations());
+        hbaseInstance.setHbaseOperations(getHbaseOperations(zkProperties));
         hbaseInstance.setStatus(0);
         hbaseInstance.setTimeout(false);
         return hbaseInstance;
@@ -84,12 +85,12 @@ public class HbaseManager implements InitializingBean {
      * @param
      * @return: com.huawei.commons.service.HbaseOperations
     **/
-    private HbaseOperations getHbaseOperations(){
+    private HbaseOperations getHbaseOperations(ZkProperties zkProperties){
         long startTime = System.currentTimeMillis();
         kerberos.login();
         HbaseOperations hbase = new Hbase(zkProperties);
         long endTime = System.currentTimeMillis();
-        log.info("Kerberos认证，创建Hbase连接耗时:{}毫秒",endTime-startTime);
+        log.info("创建Hbase连接耗时:{}毫秒",endTime-startTime);
         return hbase;
     }
 
@@ -103,24 +104,25 @@ public class HbaseManager implements InitializingBean {
      * @return: void
     **/
     private void checkHbaseInstance(){
-        list.forEach(hbaseInstance -> {
-            long endTime = System.currentTimeMillis();
-            long startTime = hbaseInstance.getData().getTime();
-            long l = endTime - startTime;
-            boolean timeout = hbaseInstance.isTimeout();
-            int status = hbaseInstance.getStatus();
-            if (status==0){
-                if (timeout){
-                    hbaseInstance.getHbaseOperations().closeConnection();
-                    list.remove(hbaseInstance);
-                    list.add(createHbaseInstance());
-                }else if (l>=timeOut){
-                    hbaseInstance.getHbaseOperations().closeConnection();
-                    list.remove(hbaseInstance);
-                    list.add(createHbaseInstance());
+        map.forEach((k,v)-> v.forEach(hbaseInstance -> {
+                long endTime = System.currentTimeMillis();
+                long startTime = hbaseInstance.getData().getTime();
+                long l = endTime - startTime;
+                boolean timeout = hbaseInstance.isTimeout();
+                int status = hbaseInstance.getStatus();
+                if (status==0){
+                    if (timeout){
+                        hbaseInstance.getHbaseOperations().closeConnection();
+                        v.remove(hbaseInstance);
+                        v.add(createHbaseInstance(k));
+                    }else if (l>=timeOut){
+                        hbaseInstance.getHbaseOperations().closeConnection();
+                        v.remove(hbaseInstance);
+                        v.add(createHbaseInstance(k));
+                    }
                 }
-            }
-        });
+            })
+        );
     }
 
     /**
@@ -132,41 +134,98 @@ public class HbaseManager implements InitializingBean {
      * @param
      * @return: com.huawei.querys.service.Hbase
     **/
-    public HbaseInstance getHbaseInstance(){
+    public synchronized Map<String,HbaseInstance> getHbaseInstance(String dbSourcetype){
         checkHbaseInstance();
-        HbaseInstance hbaseIt = null;
         log.info("开始获取Hbase操作资源实例");
+        Map<String,HbaseInstance> hbaseInstances = new HashMap<>(16);
+        /*
+         * 1.判断单个集群连接还是取所有集群连接
+         * 2.遍历集群连接池、获取集群连接
+         */
         while (true){
-            HbaseInstance hi = null;
-            int count = 0;
-            for (HbaseInstance hbaseInstance : list) {
-                long endTime = System.currentTimeMillis();
-                long startTime = hbaseInstance.getData().getTime();
-                long l = endTime - startTime;
-                if (l<timeOut){
-                    int status = hbaseInstance.getStatus();
-                    if (status==0){
-                        hbaseInstance.setStatus(1);
-                        hi = hbaseInstance;
-                        break;
-                    }
-                    count++;
-                    log.info("正在获取未使用的有效Hbase操作资源实例");
-                }else{
-                    count++;
-                    hbaseInstance.setTimeout(true);
+            //判断是否获取单个集群连接否则获取所有集群连接 并跳出循环返回
+            if (dbSourcetype!=null && !zookpeerConfig.isSingleCluster()){
+                HbaseInstance hbaseInstance = hbaseInstances.get(dbSourcetype);
+                if (hbaseInstance!=null){
+                    break;
+                }
+            }else{
+                int configSize = zookpeerConfig.getConfigSize();
+                if (configSize==hbaseInstances.size()){
+                    break;
                 }
             }
-            if (hi!=null){
-                hbaseIt = hi;
-                break;
-            }
-            if (count>=hbaseResourceProperties.getCorePoolSize() && count< hbaseResourceProperties.getMaxPoolSize()){
-                log.info("无空闲Hbase操作资源实例，开始创建新操作资源实例");
-                list.add(createHbaseInstance());
+            //遍历连接池
+            for (Map.Entry<String, CopyOnWriteArrayList<HbaseInstance>> listEntry : map.entrySet()) {
+                String key = listEntry.getKey();
+                //判断连接池是否已存在;存在跳过循环，否则继续执行
+                HbaseInstance val = hbaseInstances.get(key);
+                if (val!=null){
+                    continue;
+                }
+                CopyOnWriteArrayList<HbaseInstance> list = listEntry.getValue();
+                HbaseInstance hi = null;
+                int count = 0;
+                boolean skipC = true;
+                /*
+                 * 1.遍历单个连接池
+                 * 2.判断单个连接池中已到过期时间与未到过期时间的连接
+                 *      2.1 判断未过期的连接是否正在被使用；使用中做统计，暂未使用设置连接使用中并取出待使用
+                 *      2.2 已过期的连接做统计 并设置已过期（待后续过期检查移除）
+                 * 3.判断统计是否已达到初始连接数且还未达到最大连接数，满足条件创建新连接 否则跳过继续执行
+                 * 4.将取出的暂未使用的连接放入临时集合待返回使用
+                 */
+                for (HbaseInstance hbaseInstance : list) {
+                    long endTime = System.currentTimeMillis();
+                    long startTime = hbaseInstance.getData().getTime();
+                    long l = endTime - startTime;
+                    if (l<timeOut){
+                        int status = hbaseInstance.getStatus();
+                        if (status==0){
+                            hbaseInstance.setStatus(1);
+                            hi = hbaseInstance;
+                            skipC = false;
+                            break;
+                        }
+                        count++;
+                        log.info("正在获取未使用的有效Hbase操作资源实例");
+                    }else{
+                        count++;
+                        hbaseInstance.setTimeout(true);
+                    }
+                }
+                if (skipC && count>=hbaseResourceProperties.getCorePoolSize()
+                        && count< hbaseResourceProperties.getMaxPoolSize()){
+                    log.info("无空闲Hbase操作资源实例，开始创建新操作资源实例");
+                    list.add(createHbaseInstance(key));
+                }
+                if (hi!=null){
+                    hbaseInstances.put(key,hi);
+                }
             }
         }
-        return hbaseIt;
+        return hbaseInstances;
+    }
+
+    /**
+     * @Author lijiale
+     * @MethodName createHbaseInstance
+     * @Description 创建单个集群连接
+     * @Date 13:57 2021/11/16
+     * @Version 1.0
+     * @param key
+     * @return: com.huawei.commons.domain.HbaseInstance
+    **/
+    private HbaseInstance createHbaseInstance(String key) {
+        HbaseInstance hbaseInstance = null;
+        for (ZkProperties zkProperties : zookpeerConfig.getConfig()) {
+            String quorumName = zkProperties.getQuorumName();
+            if (quorumName.equals(key)){
+                hbaseInstance = createHbaseInstance(zkProperties);
+                break;
+            }
+        }
+        return hbaseInstance;
     }
 
     /**
@@ -180,8 +239,15 @@ public class HbaseManager implements InitializingBean {
     **/
     @Override
     public void afterPropertiesSet() {
-        for (int i=0;i<hbaseResourceProperties.getCorePoolSize();i++){
-            list.add(createHbaseInstance());
+        List<ZkProperties> zkPropertiesList = zookpeerConfig.getConfig();
+        int configSize = zookpeerConfig.getConfigSize();
+        for (int i = 0; i < configSize; i++) {
+            ZkProperties zkProperties = zkPropertiesList.get(i);
+            CopyOnWriteArrayList<HbaseInstance> list = new CopyOnWriteArrayList<>();
+            for (int j=0;j<hbaseResourceProperties.getCorePoolSize();j++){
+                list.add(createHbaseInstance(zkProperties));
+            }
+            map.put(zkProperties.getQuorumName(),list);
         }
         startCheckIdleAndTimeOut();
     }
@@ -204,19 +270,23 @@ public class HbaseManager implements InitializingBean {
                         .daemon(true)
                         .build());
         scheduledExecutorService.scheduleAtFixedRate(()->{
-            checkHbaseInstance();
             int corePoolSize = hbaseResourceProperties.getCorePoolSize();
-            int size = list.size();
-            if (size>corePoolSize){
-                int idleCount = size-corePoolSize;
-                for (int i = 0; i < idleCount; i++) {
-                    HbaseInstance hbaseInstance = list.get(i);
-                    int status = hbaseInstance.getStatus();
-                    if (status==0){
-                        hbaseInstance.getHbaseOperations().closeConnection();
-                        list.remove(hbaseInstance);
+            synchronized (this){
+                checkHbaseInstance();
+                map.forEach((k,v)->{
+                    int size = v.size();
+                    if (size>corePoolSize){
+                        int idleCount = size-corePoolSize;
+                        for (int i = 0; i < idleCount; i++) {
+                            HbaseInstance hbaseInstance = v.get(i);
+                            int status = hbaseInstance.getStatus();
+                            if (status==0){
+                                hbaseInstance.getHbaseOperations().closeConnection();
+                                v.remove(hbaseInstance);
+                            }
+                        }
                     }
-                }
+                });
             }
         }, 0, hbaseResourceProperties.getIdleTime(), TimeUnit.MINUTES);
     }

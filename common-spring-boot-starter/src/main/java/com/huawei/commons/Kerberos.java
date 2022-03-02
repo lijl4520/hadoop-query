@@ -8,6 +8,8 @@ import com.huawei.commons.domain.KerberosProperties;
 import com.huawei.commons.util.LoginUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -31,13 +33,6 @@ public class Kerberos {
         this.kerberosProperties = kerberosProperties;
     }
 
-    private Configuration configuration;
-
-    @Autowired
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
     /**
      * @Author lijiale
      * @MethodName login
@@ -49,11 +44,14 @@ public class Kerberos {
     **/
     public void login() {
         try {
+            Configuration conf = HBaseConfiguration.create();
+            conf.set("hadoop.security.authentication", "kerberos");
             String kerberosUser = kerberosProperties.getKerberosUser();
             String keytabPath = kerberosProperties.getKeytabPath();
-            LoginUtil.setJaasConf(kerberosProperties.getZookeeperDefaultLoginContextName(), kerberosUser, keytabPath);
-            LoginUtil.setZookeeperServerPrincipal(kerberosProperties.getZookeeperServerPrincipalKey(), kerberosProperties.getZookeeperDefaultServerPrincipal());
-            LoginUtil.login(kerberosUser, keytabPath, kerberosProperties.getKerberosConfPath(), configuration);
+            log.info("keytabPath===>{}",keytabPath);
+            LoginUtil.setJaasConf(kerberosProperties.getZookeeperDefaultLoginContextName(),kerberosUser, keytabPath);
+            log.info("ServerPrincipal===>{}",kerberosProperties.getZookeeperDefaultServerPrincipal());
+            LoginUtil.login(kerberosUser, keytabPath, kerberosProperties.getKerberosConfPath(), conf);
         } catch (Exception e) {
             log.error("HBase login error:", e);
         }

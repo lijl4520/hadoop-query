@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.huawei</groupId>
 	<artifactId>hadoop-common-spring-boot-starter</artifactId>
-	<version>1.1</version>
+	<version>1-index</version>
 	<name>common-spring-boot-starter</name>
 	<description>hadoop通用starter</description>
 	<properties>
@@ -23,8 +23,30 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
+			<groupId>com.huawei</groupId>
+			<artifactId>general-configuration-spring-boot-starter</artifactId>
+			<version>20211217</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-to-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
 		</dependency>
 
 		<dependency>
