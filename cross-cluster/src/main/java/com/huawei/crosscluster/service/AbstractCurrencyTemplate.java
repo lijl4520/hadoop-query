@@ -48,9 +48,9 @@ public abstract class AbstractCurrencyTemplate implements Actuator<RestBodyEntit
 
     @Override
     public <T> T execute(RestBodyEntity restBodyEntity, QueryDataCallback<T> callback, String prefix,
-                         String databaseName, AbstractRouterConfig routerConfig) {
+                         String databaseName, AbstractRouterConfig routerConfig,int regionNum) {
         List<String> tableNameList = this.getTableNameList(restBodyEntity, prefix, databaseName,routerConfig);
-        List<String> startAndEndRowKeys = this.getStartAndEndRowKeys(restBodyEntity);
+        List<String> startAndEndRowKeys = this.getStartAndEndRowKeys(restBodyEntity,regionNum);
         return callback.doInData(restBodyEntity.getProvince(),tableNameList,startAndEndRowKeys);
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractCurrencyTemplate implements Actuator<RestBodyEntit
      * @param restBody
      * @return: java.util.List<java.lang.String>
      **/
-    private List<String> getStartAndEndRowKeys(RestBodyEntity restBody) {
+    private List<String> getStartAndEndRowKeys(RestBodyEntity restBody,int regionNum) {
         StringBuffer startRowKeySb = new StringBuffer();
         StringBuffer endRowKeySb = new StringBuffer();
         String cellNum = "";
@@ -133,7 +133,7 @@ public abstract class AbstractCurrencyTemplate implements Actuator<RestBodyEntit
         }
 
         List<String> rowKeyList = new LinkedList<String>();
-        String prefix = encryAndDecryService.createPrefix(cipherText);
+        String prefix = encryAndDecryService.createPrefix(cipherText,regionNum);
         startRowKeySb.append(prefix).append("_")
                 .append(cipherText).append("_")
                 .append(restBody.getStartTime().atZone(ZoneId.of("Asia/Shanghai"))

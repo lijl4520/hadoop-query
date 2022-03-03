@@ -12,6 +12,7 @@ import com.huawei.commons.manager.QueryTaskManager;
 import com.huawei.crosscluster.domain.RouterConfig;
 import com.huawei.crosscluster.domain.rest.RestBodyEntity;
 import com.huawei.crosscluster.service.AbstractCurrencyTemplate;
+import com.huawei.ende.domain.region.RegionNumConfig;
 import org.springframework.util.StringUtils;
 
 /**
@@ -26,10 +27,12 @@ public class FiveDpiServiceImpl extends AbstractCurrencyTemplate implements Base
 
     private final QueryTaskManager queryTaskManager;
     private final RouterConfig routerConfig;
+    private final RegionNumConfig regionNumConfig;
 
-    public FiveDpiServiceImpl(QueryTaskManager queryTaskManager, RouterConfig routerConfig) {
+    public FiveDpiServiceImpl(QueryTaskManager queryTaskManager, RouterConfig routerConfig, RegionNumConfig regionNumConfig) {
         this.queryTaskManager = queryTaskManager;
         this.routerConfig = routerConfig;
+        this.regionNumConfig = regionNumConfig;
     }
 
     @Override
@@ -40,7 +43,8 @@ public class FiveDpiServiceImpl extends AbstractCurrencyTemplate implements Base
         if (StringUtils.hasLength(msisdn)){
         return super.execute(restBodyEntity,
                 (province, tableNameList, startAndEndRowKeys) ->
-                super.mappingField(queryTaskManager.query(province,tableNameList,startAndEndRowKeys)),"5GDPI","xdr", routerConfig.getFiveDpi());
+                super.mappingField(queryTaskManager.query(province,tableNameList,startAndEndRowKeys)),
+                "5GDPI","xdr", routerConfig.getFiveDpi(),this.regionNumConfig.getFiveDpiNum().getRegionNum());
         }else if (StringUtils.hasLength(imsi)||StringUtils.hasLength(imei)){
             return super.executeIndex(restBodyEntity,(family, qualifier, startVal, endVal,qualifierAndVal, rowVal, tableNames)
                             -> super.mappingField(queryTaskManager.queryIndex(family,qualifier,startVal,endVal,qualifierAndVal,rowVal,tableNames)),

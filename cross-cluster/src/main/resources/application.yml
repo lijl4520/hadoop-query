@@ -157,3 +157,17 @@ router-config:
         end-date: 20
       - start-date: 20
         end-date: 24
+region:
+  dpi-num:
+    region-num: 427
+  five-dpi-num:
+    region-num: 449
+  gn-num:
+    region-num: 4
+  ims-num:
+    region-num: 202
+  mme-num:
+    region-num: 128
+  five-nx-num:
+    region-num: 1000
+

@@ -26,9 +26,10 @@ public interface Actuator<R> {
      * @param prefix
      * @param databaseName
      * @param routerConfig
+     * @param regionNum
      * @return: T
     **/
-    <T> T execute(R r, QueryDataCallback<T> callback, String prefix, String databaseName, AbstractRouterConfig routerConfig);
+    <T> T execute(R r, QueryDataCallback<T> callback, String prefix, String databaseName, AbstractRouterConfig routerConfig,int regionNum);
 
     /**
      * @Author lijiale

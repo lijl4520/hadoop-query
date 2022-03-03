@@ -12,6 +12,7 @@ import com.huawei.commons.manager.QueryTaskManager;
 import com.huawei.crosscluster.domain.RouterConfig;
 import com.huawei.crosscluster.domain.rest.RestBodyEntity;
 import com.huawei.crosscluster.service.AbstractCurrencyTemplate;
+import com.huawei.ende.domain.region.RegionNumConfig;
 import org.springframework.util.StringUtils;
 
 /**
@@ -26,10 +27,12 @@ public class GnServiceImpl extends AbstractCurrencyTemplate implements BaseServi
 
     private final QueryTaskManager queryTaskManager;
     private final RouterConfig routerConfig;
+    private final RegionNumConfig regionNumConfig;
 
-    public GnServiceImpl(QueryTaskManager queryTaskManager, RouterConfig routerConfig) {
+    public GnServiceImpl(QueryTaskManager queryTaskManager, RouterConfig routerConfig, RegionNumConfig regionNumConfig) {
         this.queryTaskManager = queryTaskManager;
         this.routerConfig = routerConfig;
+        this.regionNumConfig = regionNumConfig;
     }
 
 
@@ -42,7 +45,7 @@ public class GnServiceImpl extends AbstractCurrencyTemplate implements BaseServi
             return super.execute(restBodyEntity,
                     (province, tableNameList, startAndEndRowKeys) ->
                             super.mappingField(queryTaskManager.query(province,tableNameList,startAndEndRowKeys)),
-                    "GN","xdr",routerConfig.getGn());
+                    "GN","xdr",routerConfig.getGn(),this.regionNumConfig.getGnNum().getRegionNum());
         }else if (StringUtils.hasLength(imei)||StringUtils.hasLength(imsi)){
             return super.executeIndex(restBodyEntity,(family, qualifier, startVal, endVal,qualifierAndVal, rowVal, tableNames)
                     -> super.mappingField(queryTaskManager.queryIndex(family,qualifier,startVal,endVal,qualifierAndVal,rowVal,tableNames)),

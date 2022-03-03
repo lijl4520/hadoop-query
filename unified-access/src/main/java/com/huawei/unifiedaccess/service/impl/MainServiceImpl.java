@@ -56,7 +56,7 @@ public class MainServiceImpl implements MainService {
         List<String> addressList = new ArrayList<>();
         String aCase = model.toUpperCase(Locale.ROOT);
         if (StringUtils.hasLength(province)){
-            String addressStr = hbaseCientAddressMap.get(province.toLowerCase());
+            String addressStr = hbaseCientAddressMap.get(province.toUpperCase(Locale.ROOT));
             if (!StringUtils.hasLength(addressStr)){
                 addressStr = hbaseCientAddressMap.get(J_Z_H + aCase);
             }

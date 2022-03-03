@@ -105,19 +105,13 @@ public class EncryAndDecryService {
      * @Date 10:29 2021/11/24
      * @Version 1.0
      * @param ciphertext
+     * @param regionNum 算法基数
      * @return: long
     **/
-    public String createPrefix(String ciphertext){
+    public String createPrefix(String ciphertext,int regionNum){
         byte[] secretBytes=digest.digest(ciphertext.getBytes());
         BigInteger bigInteger = new BigInteger(secretBytes);
-        int i = bigInteger.mod(BigInteger.valueOf(10000L)).intValue();
+        int i = bigInteger.mod(BigInteger.valueOf(regionNum*10)).intValue();
         return StringUtils.leftPad(i + "", 4, "0");
     }
-
-    /*public String createPrefix(String ciphertext){
-        byte[] secretBytes = digest.digest(digest.digest(ciphertext.getBytes()));
-        int prefixNum = (new BigInteger(secretBytes)).mod(BigInteger.valueOf(10000L)).intValue();
-        String prefix = StringUtils.leftPad(prefixNum + "", 4, "0");
-        return prefix;
-    }*/
 }
