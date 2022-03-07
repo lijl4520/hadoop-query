@@ -4,9 +4,9 @@
 
 package com.huawei.crosscluster.service;
 
-import com.huawei.commons.domain.AbstractRouter;
 import com.huawei.commons.exception.Asserts;
 import com.huawei.crosscluster.domain.rest.RestBodyEntity;
+import com.huawei.router.AbstractRouter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -35,8 +35,8 @@ public class TableNameRouter {
      * @param restBodyEntity 参数实体
      * @return: java.util.List<java.lang.String>
      **/
-    public List<String> getTableNames(RestBodyEntity restBodyEntity,String effectiveTime,
-                                      List<? extends AbstractRouter> oldTimeInterval,List<? extends AbstractRouter> newerTimeInterval){
+    public List<String> getTableNames(RestBodyEntity restBodyEntity, String effectiveTime,
+                                      List<? extends AbstractRouter> oldTimeInterval, List<? extends AbstractRouter> newerTimeInterval){
         return isEffectiveTime(oldTimeInterval,newerTimeInterval,effectiveTime,restBodyEntity);
     }
 

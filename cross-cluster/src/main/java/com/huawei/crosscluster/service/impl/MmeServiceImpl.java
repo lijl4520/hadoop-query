@@ -5,14 +5,14 @@
 package com.huawei.crosscluster.service.impl;
 
 import com.huawei.commons.BaseService;
-import com.huawei.commons.domain.annotation.ActionService;
+import com.huawei.commons.annotation.ActionService;
 import com.huawei.commons.domain.code.ResultCode;
 import com.huawei.commons.exception.QueryException;
 import com.huawei.commons.manager.QueryTaskManager;
-import com.huawei.crosscluster.domain.RouterConfig;
 import com.huawei.crosscluster.domain.rest.RestBodyEntity;
 import com.huawei.crosscluster.service.AbstractCurrencyTemplate;
 import com.huawei.ende.domain.region.RegionNumConfig;
+import com.huawei.router.RouterConfig;
 import org.springframework.util.StringUtils;
 
 /**

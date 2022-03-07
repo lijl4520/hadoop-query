@@ -21,23 +21,7 @@
 		<dependency>
 			<groupId>com.huawei</groupId>
 			<artifactId>hadoop-common-spring-boot-starter</artifactId>
-			<version>1-index</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>log4j-to-slf4j</artifactId>
-					<groupId>org.apache.logging.log4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>log4j-api</artifactId>
-					<groupId>org.apache.logging.log4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>com.huawei</groupId>
-			<artifactId>general-configuration-spring-boot-starter</artifactId>
-			<version>20211217</version>
+			<version>index-20220304</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>log4j-to-slf4j</artifactId>
@@ -64,6 +48,12 @@
 					<groupId>org.apache.logging.log4j</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.huawei</groupId>
+			<artifactId>query-framework-spring-boot-starter</artifactId>
+			<version>20220304</version>
 		</dependency>
 
 		<dependency>

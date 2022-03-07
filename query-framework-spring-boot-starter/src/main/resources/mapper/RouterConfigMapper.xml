@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huawei.router.mapper.RouterMapper">
+
+    <resultMap id="MmeBaseResultMap" type="com.huawei.router.MmeRouterConfig">
+        <result column="rule_effective_time" jdbcType="VARCHAR" property="effectiveTime" />
+        <collection property="oldTimeInterval" ofType="com.huawei.router.OldTimeIntervalProperties">
+            <result column="old_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="old_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+        <collection property="newerTimeInterval" ofType="com.huawei.router.NewerTimeIntervalProperties">
+            <result column="new_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="new_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="ImsBaseResultMap" type="com.huawei.router.ImsRouterConfig">
+        <result column="rule_effective_time" jdbcType="VARCHAR" property="effectiveTime" />
+        <collection property="oldTimeInterval" ofType="com.huawei.router.OldTimeIntervalProperties">
+            <result column="old_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="old_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+        <collection property="newerTimeInterval" ofType="com.huawei.router.NewerTimeIntervalProperties">
+            <result column="new_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="new_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="DpiBaseResultMap" type="com.huawei.router.DpiRouterConfig">
+        <result column="rule_effective_time" jdbcType="VARCHAR" property="effectiveTime" />
+        <collection property="oldTimeInterval" ofType="com.huawei.router.OldTimeIntervalProperties">
+            <result column="old_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="old_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+        <collection property="newerTimeInterval" ofType="com.huawei.router.NewerTimeIntervalProperties">
+            <result column="new_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="new_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="FiveDpiBaseResultMap" type="com.huawei.router.FiveDpiRouterConfig">
+        <result column="rule_effective_time" jdbcType="VARCHAR" property="effectiveTime" />
+        <collection property="oldTimeInterval" ofType="com.huawei.router.OldTimeIntervalProperties">
+            <result column="old_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="old_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+        <collection property="newerTimeInterval" ofType="com.huawei.router.NewerTimeIntervalProperties">
+            <result column="new_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="new_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="NxBaseResultMap" type="com.huawei.router.FiveNxRouterConfig">
+        <result column="rule_effective_time" jdbcType="VARCHAR" property="effectiveTime" />
+        <collection property="oldTimeInterval" ofType="com.huawei.router.OldTimeIntervalProperties">
+            <result column="old_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="old_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+        <collection property="newerTimeInterval" ofType="com.huawei.router.NewerTimeIntervalProperties">
+            <result column="new_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="new_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="GnBaseResultMap" type="com.huawei.router.GnRouterConfig">
+        <result column="rule_effective_time" jdbcType="VARCHAR" property="effectiveTime" />
+        <collection property="oldTimeInterval" ofType="com.huawei.router.OldTimeIntervalProperties">
+            <result column="old_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="old_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+        <collection property="newerTimeInterval" ofType="com.huawei.router.NewerTimeIntervalProperties">
+            <result column="new_start_time" jdbcType="INTEGER" property="startDate"/>
+            <result column="new_end_time" jdbcType="INTEGER" property="endDate"/>
+        </collection>
+    </resultMap>
+
+    <select id="findMmeRouterConfig" resultMap="MmeBaseResultMap">
+        select rule_effective_time,
+               start_date as old_start_time,
+               end_date   as old_end_time,
+               99         as new_start_time,
+               99         as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 1
+          and old_new_rule = 'old'
+        union all
+        select rule_effective_time,
+               99       as old_start_time,
+               99         as old_end_time,
+               start_date as new_start_time,
+               end_date   as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 1
+          and old_new_rule = 'new';
+    </select>
+
+    <select id="findImsRouterConfig" resultMap="ImsBaseResultMap">
+        select rule_effective_time,
+               start_date as old_start_time,
+               end_date   as old_end_time,
+               99         as new_start_time,
+               99         as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 2
+          and old_new_rule = 'old'
+        union all
+        select rule_effective_time,
+               99       as old_start_time,
+               99         as old_end_time,
+               start_date as new_start_time,
+               end_date   as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 2
+          and old_new_rule = 'new';
+    </select>
+
+    <select id="findDpiRouterConfig" resultMap="DpiBaseResultMap">
+        select rule_effective_time,
+               start_date as old_start_time,
+               end_date   as old_end_time,
+               99         as new_start_time,
+               99         as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 3
+          and old_new_rule = 'old'
+        union all
+        select rule_effective_time,
+               99       as old_start_time,
+               99         as old_end_time,
+               start_date as new_start_time,
+               end_date   as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 3
+          and old_new_rule = 'new';
+    </select>
+
+    <select id="findFiveDpiRouterConfig" resultMap="FiveDpiBaseResultMap">
+        select rule_effective_time,
+               start_date as old_start_time,
+               end_date   as old_end_time,
+               99         as new_start_time,
+               99         as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 4
+          and old_new_rule = 'old'
+        union all
+        select rule_effective_time,
+               99       as old_start_time,
+               99         as old_end_time,
+               start_date as new_start_time,
+               end_date   as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 4
+          and old_new_rule = 'new';
+    </select>
+
+    <select id="findFiveNxRouterConfig" resultMap="NxBaseResultMap">
+        select rule_effective_time,
+               start_date as old_start_time,
+               end_date   as old_end_time,
+               99         as new_start_time,
+               99         as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 5
+          and old_new_rule = 'old'
+        union all
+        select rule_effective_time,
+               99       as old_start_time,
+               99         as old_end_time,
+               start_date as new_start_time,
+               end_date   as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 5
+          and old_new_rule = 'new';
+    </select>
+
+    <select id="findGnRouterConfig" resultMap="GnBaseResultMap">
+        select rule_effective_time,
+               start_date as old_start_time,
+               end_date   as old_end_time,
+               99         as new_start_time,
+               99         as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 6
+          and old_new_rule = 'old'
+        union all
+        select rule_effective_time,
+               99       as old_start_time,
+               99         as old_end_time,
+               start_date as new_start_time,
+               end_date   as new_end_time
+        from hbase_bill_table_router
+        where bill_type_id = 6
+          and old_new_rule = 'new';
+    </select>
+</mapper>

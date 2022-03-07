@@ -7,12 +7,11 @@ package com.huawei.crosscluster.service;
 import com.huawei.commons.Actuator;
 import com.huawei.commons.QueryDataCallback;
 import com.huawei.commons.QueryIndexDataCallback;
-import com.huawei.commons.domain.AbstractRouterConfig;
 import com.huawei.commons.domain.code.ResultCode;
 import com.huawei.commons.exception.Asserts;
-import com.huawei.commons.exception.QueryException;
 import com.huawei.crosscluster.domain.rest.RestBodyEntity;
 import com.huawei.ende.encryption.EncryAndDecryService;
+import com.huawei.router.AbstractRouterConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -48,7 +47,7 @@ public abstract class AbstractCurrencyTemplate implements Actuator<RestBodyEntit
 
     @Override
     public <T> T execute(RestBodyEntity restBodyEntity, QueryDataCallback<T> callback, String prefix,
-                         String databaseName, AbstractRouterConfig routerConfig,int regionNum) {
+                         String databaseName, AbstractRouterConfig routerConfig, int regionNum) {
         List<String> tableNameList = this.getTableNameList(restBodyEntity, prefix, databaseName,routerConfig);
         List<String> startAndEndRowKeys = this.getStartAndEndRowKeys(restBodyEntity,regionNum);
         return callback.doInData(restBodyEntity.getProvince(),tableNameList,startAndEndRowKeys);
